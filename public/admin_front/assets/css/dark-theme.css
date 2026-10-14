@@ -1,0 +1,300 @@
+/* ============================================================
+   Тёмная тема админки Lidza (оверлей поверх светлой темы Sneat).
+   Активируется классом .theme-dark на <html>. Переключатель — в навбаре,
+   выбор хранится в localStorage (ключ admin-theme).
+   Первая версия: основные поверхности (фон, карточки, меню, навбар,
+   таблицы, формы, дропдауны, пагинация, модалки).
+   ============================================================ */
+
+:root.theme-dark {
+    --lz-bg: #232333;          /* фон страницы */
+    --lz-surface: #2b2c40;     /* карточки, навбар, меню */
+    --lz-elevated: #303152;    /* инпуты, дропдауны, ховер */
+    --lz-border: #44465e;      /* границы */
+    --lz-text: #d5d6ea;        /* основной текст */
+    --lz-muted: #8f90a6;       /* приглушённый текст */
+
+    color-scheme: dark;
+
+    /* Bootstrap-переменные — покрывают большинство компонентов разом */
+    --bs-body-bg: var(--lz-bg);
+    --bs-body-color: var(--lz-text);
+    --bs-border-color: var(--lz-border);
+    --bs-secondary-bg: var(--lz-elevated);
+    --bs-tertiary-bg: var(--lz-elevated);
+    --bs-heading-color: #e7e8f5;
+    --bs-emphasis-color: #ffffff;
+
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--lz-text);
+    --bs-table-border-color: var(--lz-border);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-hover-color: var(--lz-text);
+}
+
+/* Фон страницы */
+.theme-dark body,
+.theme-dark .layout-wrapper,
+.theme-dark .layout-page,
+.theme-dark .content-wrapper {
+    background-color: var(--lz-bg) !important;
+    color: var(--lz-text);
+}
+
+/* Карточки и белые поверхности */
+.theme-dark .card,
+.theme-dark .bg-white,
+.theme-dark .card-body,
+.theme-dark .card-header,
+.theme-dark .card-footer {
+    background-color: var(--lz-surface) !important;
+    color: var(--lz-text);
+    border-color: var(--lz-border);
+}
+.theme-dark .card {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Заголовки и общий текст */
+.theme-dark h1, .theme-dark h2, .theme-dark h3,
+.theme-dark h4, .theme-dark h5, .theme-dark h6,
+.theme-dark .text-dark,
+.theme-dark strong {
+    color: #e7e8f5 !important;
+}
+.theme-dark .text-muted,
+.theme-dark .text-secondary {
+    color: var(--lz-muted) !important;
+}
+
+/* Боковое меню (Sneat bg-menu-theme) */
+.theme-dark .bg-menu-theme {
+    background-color: var(--lz-surface) !important;
+}
+.theme-dark .menu-vertical .menu-item .menu-link,
+.theme-dark .app-brand-text,
+.theme-dark .menu-header {
+    color: var(--lz-text) !important;
+}
+/* Ховер по пунктам меню — приятный фиолетовый */
+.theme-dark .menu-vertical .menu-item .menu-link:hover {
+    background-color: rgba(105, 108, 255, 0.12) !important;
+    color: #ffffff !important;
+}
+/* Активный пункт (и лист «Все объявления», и раскрытый родитель «Товары») —
+   тот же фиолетовый вместо белого фона из светлой темы. Убираем белый фон,
+   градиент и свечение (box-shadow), которые ставит Sneat в light-style. */
+.theme-dark .menu-inner .menu-item.active > .menu-link,
+.theme-dark .menu-sub .menu-item.active > .menu-link,
+.theme-dark .menu-inner .menu-item.active > .menu-link.menu-toggle {
+    background: rgba(105, 108, 255, 0.22) !important;
+    color: #cfd0ff !important;
+    box-shadow: none !important;
+}
+.theme-dark .menu-inner .menu-item.active > .menu-link .menu-icon,
+.theme-dark .menu-sub .menu-item.active > .menu-link::before {
+    color: #cfd0ff !important;
+}
+.theme-dark .menu-sub .menu-link {
+    color: var(--lz-muted) !important;
+}
+
+/* Спец-подсветки пунктов меню. В светлой теме это пастельные фоны
+   (.bg-products = кремовый, .bg-estates = сиреневый, .bg-cars = розовый).
+   В тёмной теме заменяем на полупрозрачные тинты в тон, чтобы не выбивались.
+   «Товары» (.bg-products) — оранжевый, как просили. Перебиваем в т.ч. ховер и
+   активное состояние (повышенная специфичность). */
+.theme-dark .bg-products,
+.theme-dark .menu-vertical .menu-item .bg-products.menu-link,
+.theme-dark .menu-item.active > .menu-link.bg-products {
+    background: rgba(255, 159, 67, 0.18) !important;
+    color: #ffbe86 !important;
+}
+.theme-dark .menu-vertical .menu-item .bg-products.menu-link:hover,
+.theme-dark .menu-item.active > .menu-link.bg-products:hover {
+    background: rgba(255, 159, 67, 0.28) !important;
+    color: #ffd0a6 !important;
+}
+.theme-dark .bg-products .menu-icon,
+.theme-dark .bg-products > div {
+    color: #ffbe86 !important;
+}
+
+.theme-dark .bg-estates {
+    background-color: rgba(105, 108, 255, 0.16) !important;
+}
+.theme-dark .bg-cars {
+    background-color: rgba(255, 91, 120, 0.16) !important;
+}
+.theme-dark .menu-divider {
+    border-color: var(--lz-border) !important;
+}
+
+/* Верхняя панель (navbar-detached, bg-navbar-theme) */
+.theme-dark .bg-navbar-theme {
+    background-color: var(--lz-surface) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.theme-dark .navbar,
+.theme-dark .navbar .nav-link,
+.theme-dark .navbar .avatar i {
+    color: var(--lz-text) !important;
+}
+
+/* Таблицы */
+.theme-dark .table {
+    color: var(--lz-text);
+    border-color: var(--lz-border);
+}
+.theme-dark .table > :not(caption) > * > * {
+    border-bottom-color: var(--lz-border);
+}
+.theme-dark .table.table-light,
+.theme-dark .table .table-light,
+.theme-dark .table thead.table-light th {
+    background-color: var(--lz-elevated) !important;
+    color: var(--lz-text) !important;
+    border-color: var(--lz-border) !important;
+}
+.theme-dark .table-hover > tbody > tr:hover > * {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--lz-text);
+}
+/* Подсветка удалённых строк — приглушённый красный вместо ярко-розового */
+.theme-dark tr[style*="background: #ffe4e4"],
+.theme-dark tr[style*="background:#ffe4e4"] {
+    background: rgba(255, 90, 90, 0.12) !important;
+}
+
+/* Формы */
+.theme-dark .form-control,
+.theme-dark .form-select,
+.theme-dark .input-group-text {
+    background-color: var(--lz-elevated) !important;
+    border-color: var(--lz-border) !important;
+    color: var(--lz-text) !important;
+}
+.theme-dark .form-control::placeholder {
+    color: var(--lz-muted) !important;
+}
+.theme-dark .form-control:focus,
+.theme-dark .form-select:focus {
+    border-color: #696cff !important;
+    box-shadow: 0 0 0 0.15rem rgba(105, 108, 255, 0.25) !important;
+}
+.theme-dark .form-label,
+.theme-dark label {
+    color: var(--lz-text);
+}
+
+/* Дропдауны */
+.theme-dark .dropdown-menu {
+    background-color: var(--lz-elevated) !important;
+    border-color: var(--lz-border) !important;
+}
+.theme-dark .dropdown-item {
+    color: var(--lz-text) !important;
+}
+.theme-dark .dropdown-item:hover,
+.theme-dark .dropdown-item:focus {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
+}
+.theme-dark .dropdown-divider {
+    border-color: var(--lz-border) !important;
+}
+
+/* Пагинация */
+.theme-dark .pagination .page-link {
+    background-color: var(--lz-surface);
+    border-color: var(--lz-border);
+    color: var(--lz-text);
+}
+.theme-dark .pagination .page-item.active .page-link {
+    background-color: #696cff;
+    border-color: #696cff;
+    color: #fff;
+}
+.theme-dark .pagination .page-item.disabled .page-link {
+    background-color: var(--lz-surface);
+    color: var(--lz-muted);
+}
+
+/* Модалки, оффканвасы */
+.theme-dark .modal-content,
+.theme-dark .offcanvas {
+    background-color: var(--lz-surface) !important;
+    color: var(--lz-text);
+    border-color: var(--lz-border);
+}
+.theme-dark .modal-header,
+.theme-dark .modal-footer {
+    border-color: var(--lz-border);
+}
+
+/* Границы-хелперы */
+.theme-dark .border,
+.theme-dark .border-top,
+.theme-dark .border-bottom,
+.theme-dark .border-start,
+.theme-dark .border-end {
+    border-color: var(--lz-border) !important;
+}
+
+/* Вкладки (nav-tabs) и их содержимое. В светлой теме Sneat активная вкладка и
+   панель .tab-content белые — в тёмной перекрашиваем, иначе остаётся белый фон
+   (карточка объявления, вкладки пользователя и т.д.). */
+.theme-dark .nav-tabs,
+.theme-dark .nav-align-top .nav-tabs,
+.theme-dark .nav-align-top > .nav-tabs {
+    border-color: var(--lz-border) !important;
+    background-color: transparent !important;
+}
+.theme-dark .nav-tabs .nav-link,
+.theme-dark .nav-pills .nav-link {
+    color: var(--lz-muted) !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+.theme-dark .nav-tabs .nav-link:hover {
+    color: var(--lz-text) !important;
+}
+.theme-dark .nav-tabs .nav-link.active {
+    background-color: var(--lz-surface) !important;
+    color: #ffffff !important;
+    border-color: var(--lz-border) var(--lz-border) transparent !important;
+    box-shadow: 0 -2px 0 #696cff inset !important;
+}
+.theme-dark .nav-pills .nav-link.active {
+    background-color: #696cff !important;
+    color: #ffffff !important;
+}
+.theme-dark .tab-content {
+    background-color: var(--lz-surface) !important;
+    color: var(--lz-text) !important;
+    box-shadow: none !important;
+}
+/* Разделители (divider) внутри вкладок */
+.theme-dark .divider .divider-text {
+    color: var(--lz-muted) !important;
+    background-color: transparent;
+}
+.theme-dark .divider:not(.divider-dashed)::before,
+.theme-dark .divider:not(.divider-dashed)::after {
+    border-color: var(--lz-border) !important;
+}
+
+/* Списки (list-group), которые тоже белые в светлой теме */
+.theme-dark .list-group-item {
+    background-color: var(--lz-surface) !important;
+    color: var(--lz-text);
+    border-color: var(--lz-border);
+}
+
+/* Тултип статистики уже тёмный — оставляем как есть */
+
+/* Переключатель темы в навбаре */
+.theme-toggle-link {
+    cursor: pointer;
+}

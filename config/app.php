@@ -78,7 +78,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    /*
+     * Админка и сообщения только на русском, поэтому язык не берётся из .env:
+     * в .env из заготовки стоит APP_LOCALE=en, и его пришлось бы править руками.
+     */
+    'locale' => 'ru',
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 

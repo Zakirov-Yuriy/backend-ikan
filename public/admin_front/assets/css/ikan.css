@@ -1,0 +1,7 @@
+/* Мелочи админки ИКАН поверх шаблона */
+.ikan-photo img { max-height: 220px; object-fit: cover; }
+#gallerySortable .ui-sortable-helper { box-shadow: 0 0.25rem 1rem rgba(161, 172, 184, 0.45); }
+#gallerySortable .ui-sortable-placeholder { visibility: visible !important; min-height: 72px; border: 2px dashed #d9dee3; }
+#sortable tr.ui-sortable-helper { display: table; background: #fff; box-shadow: 0 0.25rem 1rem rgba(161, 172, 184, 0.45); }
+.theme-dark #sortable tr.ui-sortable-helper { background: #2b2c40; }
+.js-preview-list img { width: 100%; height: 90px; object-fit: cover; }
