@@ -19,6 +19,20 @@ class AdminTest extends TestCase
 
     private User $user;
 
+    /*
+     * Файл для загрузки из tests/Fixtures. Картинки там настоящие, а не
+     * нарисованные GD: в PHP у Анны (php.new) расширения GD нет.
+     */
+    private function upload(string $name): UploadedFile
+    {
+        $extension = pathinfo($name, PATHINFO_EXTENSION);
+        $source = base_path('tests/Fixtures/'.($extension === 'pdf' ? 'document.pdf' : 'photo.'.$extension));
+        $copy = tempnam(sys_get_temp_dir(), 'upl');
+        copy($source, $copy);
+
+        return new UploadedFile($copy, $name, mime_content_type($copy) ?: null, null, true);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -123,8 +137,8 @@ class AdminTest extends TestCase
             'price' => '120000',
             'features_text' => "Кухня\n\n  Балкон \n",
             'data_items' => [['label' => 'НДС', 'value' => 'Включён'], ['label' => '', 'value' => '']],
-            'photo_card' => UploadedFile::fake()->image('card.jpg', 800, 600),
-            'gallery' => [UploadedFile::fake()->image('g1.jpg', 800, 600), UploadedFile::fake()->image('g2.png', 800, 600)],
+            'photo_card' => $this->upload('card.jpg'),
+            'gallery' => [$this->upload('g1.jpg'), $this->upload('g2.png')],
         ]);
         $apartment = Apartment::query()->where('slug', 'apartament-a7')->firstOrFail();
         $response->assertRedirect("/admin/apartments/{$apartment->id}/edit");
@@ -159,7 +173,7 @@ class AdminTest extends TestCase
             'photo_order' => [$gallery[1]->id, $gallery[0]->id],
             'photo_alt' => [$gallery[1]->id => 'Гостиная'],
             'delete_photo' => [$card->id],
-            'photo_mobile' => UploadedFile::fake()->image('m.webp', 400, 600),
+            'photo_mobile' => $this->upload('m.webp'),
         ])->assertRedirect("/admin/apartments/{$apartment->id}/edit");
 
         $apartment = $apartment->fresh();
@@ -176,7 +190,7 @@ class AdminTest extends TestCase
         /* Ошибки формы */
         $this->put("/admin/apartments/{$apartment->id}", ['name' => '', 'slug' => 'a4', 'complex_id' => 999, 'status' => 'nope'])
             ->assertSessionHasErrors(['name', 'slug', 'complex_id', 'status']);
-        $this->post('/admin/apartments', ['name' => 'X', 'complex_id' => $l2->id, 'status' => 'ready', 'photo_card' => UploadedFile::fake()->create('doc.pdf', 10, 'application/pdf')])
+        $this->post('/admin/apartments', ['name' => 'X', 'complex_id' => $l2->id, 'status' => 'ready', 'photo_card' => $this->upload('doc.pdf')])
             ->assertSessionHasErrors('photo_card');
 
         /* Порядок и удаление */
