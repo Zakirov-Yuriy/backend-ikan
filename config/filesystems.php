@@ -38,6 +38,19 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Фотографии объектов для сайта. Лежат прямо в public/media, чтобы
+         * отдаваться веб-сервером без символической ссылки storage:link
+         * (на Windows ей нужны права администратора).
+         */
+        'media' => [
+            'driver' => 'local',
+            'root' => public_path('media'),
+            'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/').'/media',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
