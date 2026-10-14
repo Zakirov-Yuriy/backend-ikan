@@ -11,7 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <title>Админка ИКАН: @yield('title')</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}"/>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48"/>
+    <link rel="icon" href="{{ asset('icon.svg') }}" type="image/svg+xml"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/fonts/public-sans.css') }}"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/fonts/boxicons.css') }}"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/css/core.css') }}" class="template-customizer-core-css"/>

@@ -5,19 +5,21 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Админка ИКАН: вход</title>
-    <link rel="icon" href="{{ asset('favicon.ico') }}"/>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48"/>
+    <link rel="icon" href="{{ asset('icon.svg') }}" type="image/svg+xml"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/fonts/public-sans.css') }}"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/fonts/boxicons.css') }}"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/css/core.css') }}" class="template-customizer-core-css"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/css/theme-default.css') }}" class="template-customizer-theme-css"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/css/style.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('admin_front/assets/css/ikan.css') }}"/>
 </head>
 <body>
 <div class="m-auto container d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
     <div class="card col-md-4">
         <div class="card-body">
             <div class="app-brand justify-content-center mb-4">
-                <span class="app-brand-logo"><i class="bx bx-buildings fs-2 text-primary"></i></span>
+                <span class="app-brand-logo">@include('admin.mark')</span>
                 <span class="app-brand-text demo fw-bolder ms-2 text-body">ИКАН</span>
             </div>
             <form action="{{ route('admin.login.attempt') }}" method="POST">

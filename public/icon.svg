@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19">
+  <!-- Знак ИКАН из файла Vector_38.svg (19 на 17), сдвинут на 1 вниз, чтобы стоять по центру квадрата -->
+  <g transform="translate(0 1)">
+    <path d="M6 16L18 0.5L0.5 8.5V0.5H18V16H6Z" fill="#082234"/>
+    <path d="M18 0.5L6 16H18V0.5ZM18 0.5L0.5 8.5V0.5H18Z" fill="none" stroke="#082234"/>
+  </g>
+</svg>

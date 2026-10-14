@@ -1,4 +1,7 @@
 /* Мелочи админки ИКАН поверх шаблона */
+/* Знак ИКАН в меню и на входе: тёмно-синий с сайта, в тёмной теме белый */
+.app-brand-logo .ikan-mark { color: #082234; display: block; }
+.theme-dark .app-brand-logo .ikan-mark { color: #fff; }
 .ikan-photo img { max-height: 220px; object-fit: cover; }
 #gallerySortable .ui-sortable-helper { box-shadow: 0 0.25rem 1rem rgba(161, 172, 184, 0.45); }
 #gallerySortable .ui-sortable-placeholder { visibility: visible !important; min-height: 72px; border: 2px dashed #d9dee3; }

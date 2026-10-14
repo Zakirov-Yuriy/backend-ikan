@@ -3,7 +3,7 @@
     <div class="app-brand demo">
         <a href="{{ route('admin.home') }}" class="app-brand-link">
             <span class="app-brand-logo">
-                <i class="app-brand-text demo bx bx-buildings"></i>
+                @include('admin.mark')
             </span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2">ИКАН</span>
         </a>
