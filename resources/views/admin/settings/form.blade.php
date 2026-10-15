@@ -5,11 +5,18 @@
         <div class="row">
             <div class="col-xl-8">
                 <div class="card mb-4">
-                    <h5 class="card-header">Уведомления о заявках</h5>
+                    <h5 class="card-header">Настройки сайта</h5>
                     <form action="{{ route('admin.settings.update') }}" method="POST">
                         @csrf @method('PUT')
                         <div class="card-body">
                             @include('admin.notifications')
+                            <div class="mb-4">
+                                <label for="phone" class="form-label">Телефон на сайте*</label>
+                                <input type="text" class="form-control" name="phone" id="phone" maxlength="30" required placeholder="+7 (991) 255-29-00" value="{{ old('phone', $phone) }}"/>
+                                <div class="form-text">Один телефон везде: в шапке, в подвале, на кнопках «Позвонить» и в текстах форм. Пишется так, как должен выглядеть на сайте.</div>
+                            </div>
+
+                            <div class="divider text-start"><div class="divider-text">Уведомления о заявках</div></div>
                             <div class="mb-4">
                                 <label for="notify_emails" class="form-label">Почта для уведомлений</label>
                                 <input type="text" class="form-control" name="notify_emails" id="notify_emails" maxlength="500" placeholder="zakcoyote@gmail.com, manager@ik-ikan.ru" value="{{ old('notify_emails', $notifyEmails) }}"/>

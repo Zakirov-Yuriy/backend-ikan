@@ -28,6 +28,8 @@ class HomeSeeder extends Seeder
         $this->objects();
 
         if (HomePage::query()->exists()) {
+            /* До 15.10 13:37 «Весь каталог» никуда не вёл; теперь адрес решён */
+            HomePage::query()->where('objects_all_href', '#')->update(['objects_all_href' => '/dlya-sebya']);
             $this->command?->info('Главная уже заполнена, тексты не тронуты.');
 
             return;
@@ -78,8 +80,8 @@ class HomeSeeder extends Seeder
             'objects_eyebrow' => 'Проверенная недвижимость',
             'objects_title' => 'Актуальные объекты',
             'objects_all_label' => 'Весь каталог',
-            /* Куда ведёт «Весь каталог», Анна ещё не сказала; пока никуда */
-            'objects_all_href' => '#',
+            /* «Весь каталог» ведёт на «Квартиры для собственного проживания» (Анна, 15.10 13:37) */
+            'objects_all_href' => '/dlya-sebya',
             'objects_more_label' => 'Подробнее',
 
             'consultation_eyebrow' => 'Персональный подбор',

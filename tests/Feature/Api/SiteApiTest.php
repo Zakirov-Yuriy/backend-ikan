@@ -103,6 +103,7 @@ class SiteApiTest extends TestCase
         $response->assertJsonPath('data.objects.items.0.slug', 'a4');
         $response->assertJsonPath('data.objects.items.0.photos.card.url', config('app.url').'/media/apartments/a4-card.jpg');
         $response->assertJsonPath('data.objects.all.label', 'Весь каталог');
+        $response->assertJsonPath('data.objects.all.href', '/dlya-sebya');
         $response->assertJsonPath('data.consultation.photo.url', config('app.url').'/media/home/consultation.jpg');
 
         Apartment::query()->where('slug', 'a6')->update(['show_home' => false]);
@@ -129,6 +130,14 @@ class SiteApiTest extends TestCase
         $this->getJson('/api/apartments/a4')->assertJsonCount(4, 'data.gallery');
         $this->getJson('/api/home')->assertJsonCount(5, 'data.scenarios')->assertJsonCount(4, 'data.directions.items');
         $this->assertSame(1, HomePage::query()->count());
+
+        /* У кого «Весь каталог» ещё вёл в никуда, после повторной загрузки ведёт на список */
+        HomePage::query()->update(['objects_all_href' => '#', 'hero_title' => 'Своё']);
+        $this->seed(SiteContentSeeder::class);
+        $this->getJson('/api/home')->assertJsonPath('data.objects.all.href', '/dlya-sebya')->assertJsonPath('data.hero.title', 'Своё');
+
+        /* Телефон по умолчанию, пока в настройках не задан */
+        $this->getJson('/api/site')->assertOk()->assertJsonPath('data.phone.href', 'tel:+79912552900');
     }
 
     /* Файлы в public/media отдаёт веб-сервер, не Laravel; здесь проверка, что они на месте */

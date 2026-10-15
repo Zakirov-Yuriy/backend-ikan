@@ -98,12 +98,21 @@ class LeadsTest extends TestCase
         $this->delete("/admin/leads/{$lead->id}")->assertRedirect('/admin/leads');
         $this->assertDatabaseMissing('leads', ['id' => $lead->id]);
 
-        $this->get('/admin/settings')->assertOk()->assertSee('Почта для уведомлений');
-        $this->put('/admin/settings', ['notify_emails' => 'x@example.com, bad', 'telegram_chat_id' => ''])->assertSessionHasErrors();
-        $this->put('/admin/settings', ['notify_emails' => 'x@example.com; y@example.com', 'telegram_chat_id' => 'abc'])->assertSessionHasErrors('telegram_chat_id');
-        $this->put('/admin/settings', ['notify_emails' => 'x@example.com; y@example.com', 'telegram_chat_id' => '-100123'])->assertRedirect('/admin/settings');
+        $this->get('/admin/settings')->assertOk()->assertSee('Почта для уведомлений')->assertSee('Телефон на сайте')->assertSee('+7 (991) 255-29-00');
+        $phone = ['phone' => '+7 (991) 255-29-00'];
+        $this->put('/admin/settings', $phone + ['notify_emails' => 'x@example.com, bad', 'telegram_chat_id' => ''])->assertSessionHasErrors();
+        $this->put('/admin/settings', $phone + ['notify_emails' => 'x@example.com; y@example.com', 'telegram_chat_id' => 'abc'])->assertSessionHasErrors('telegram_chat_id');
+        $this->put('/admin/settings', ['phone' => 'позвоните', 'notify_emails' => '', 'telegram_chat_id' => ''])->assertSessionHasErrors('phone');
+        $this->put('/admin/settings', ['phone' => '+7 12', 'notify_emails' => '', 'telegram_chat_id' => ''])->assertSessionHasErrors();
+        $this->put('/admin/settings', $phone + ['notify_emails' => 'x@example.com; y@example.com', 'telegram_chat_id' => '-100123'])->assertRedirect('/admin/settings');
         $this->assertSame(['x@example.com', 'y@example.com'], Setting::notifyEmails());
         $this->assertSame('-100123', Setting::get(Setting::TELEGRAM_CHAT_ID));
+
+        /* Телефон уходит на сайт через /api/site: как написан и как ссылка */
+        $this->getJson('/api/site')->assertOk()->assertJsonPath('data.phone.label', '+7 (991) 255-29-00')->assertJsonPath('data.phone.href', 'tel:+79912552900');
+        $this->put('/admin/settings', ['phone' => '+381 64 123 45 67', 'notify_emails' => '', 'telegram_chat_id' => ''])->assertRedirect('/admin/settings');
+        $this->getJson('/api/site')->assertJsonPath('data.phone.label', '+381 64 123 45 67')->assertJsonPath('data.phone.href', 'tel:+381641234567');
+        $this->put('/admin/settings', $phone + ['notify_emails' => 'x@example.com; y@example.com', 'telegram_chat_id' => '-100123']);
 
         $this->post('/admin/settings/test')->assertRedirect('/admin/settings')->assertSessionHas('success');
         Mail::assertSent(LeadMail::class, fn (LeadMail $mail) => $mail->test === true);

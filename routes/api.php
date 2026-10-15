@@ -6,12 +6,14 @@ use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\RestaurantController;
+use App\Http\Controllers\Api\SiteController;
 use Illuminate\Support\Facades\Route;
 
 /*
  * API для сайта. Адреса начинаются с /api, ответы в JSON, обёрнуты в
  * { "data": ... }. Чтение объектов, текстов главной и списков, приём заявок.
  */
+Route::get('/site', [SiteController::class, 'show']);
 Route::get('/home', [HomeController::class, 'show']);
 Route::get('/pages/{key}', [PageController::class, 'show']);
 Route::get('/complexes', [ComplexController::class, 'index']);

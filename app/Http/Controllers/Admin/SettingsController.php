@@ -10,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/* Настройки: куда слать уведомления о заявках */
+/* Настройки: телефон на сайте, куда слать уведомления о заявках */
 class SettingsController extends Controller
 {
     public function __construct(private readonly LeadNotifier $notifier) {}
@@ -18,6 +18,7 @@ class SettingsController extends Controller
     public function edit(): View
     {
         return view('admin.settings.form', [
+            'phone' => Setting::get(Setting::PHONE, Setting::DEFAULT_PHONE),
             'notifyEmails' => Setting::get(Setting::NOTIFY_EMAILS, ''),
             'telegramChatId' => Setting::get(Setting::TELEGRAM_CHAT_ID, ''),
             'telegramToken' => (string) config('services.telegram.token') !== '',
@@ -29,14 +30,20 @@ class SettingsController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'phone' => ['required', 'string', 'max:30', 'regex:/^\+?[\d\s()\-]+$/'],
             'notify_emails' => ['nullable', 'string', 'max:500'],
             'telegram_chat_id' => ['nullable', 'string', 'max:50', 'regex:/^-?\d+$/'],
         ], [
+            'phone.regex' => 'Телефон: цифры, пробелы, скобки, дефис и плюс в начале, например +7 (991) 255-29-00.',
             'telegram_chat_id.regex' => 'Chat id в Telegram это число, например 123456789 или -1001234567890. Нажмите «Найти chat id» ниже.',
         ], [
+            'phone' => '«телефон»',
             'notify_emails' => '«почта для уведомлений»',
             'telegram_chat_id' => '«chat id в Telegram»',
         ]);
+        if (strlen(preg_replace('/\D/', '', $data['phone'])) < 6) {
+            return back()->withInput()->withErrors('В телефоне слишком мало цифр.');
+        }
 
         $raw = (string) ($data['notify_emails'] ?? '');
         $bad = array_filter(preg_split('/[\s,;]+/', $raw) ?: [], fn ($e) => $e !== '' && ! filter_var($e, FILTER_VALIDATE_EMAIL));
@@ -44,6 +51,7 @@ class SettingsController extends Controller
             return back()->withInput()->withErrors('Это не похоже на почту: '.implode(', ', $bad));
         }
 
+        Setting::set(Setting::PHONE, trim($data['phone']));
         Setting::set(Setting::NOTIFY_EMAILS, trim($raw));
         Setting::set(Setting::TELEGRAM_CHAT_ID, trim((string) ($data['telegram_chat_id'] ?? '')));
 
