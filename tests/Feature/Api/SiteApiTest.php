@@ -35,6 +35,8 @@ class SiteApiTest extends TestCase
         $response->assertJsonPath('data.0.area', 28);
         $response->assertJsonPath('data.0.status_label', 'Строится');
         $response->assertJsonPath('data.0.photos.card.url', config('app.url').'/media/apartments/a4-card.jpg');
+        $response->assertJsonPath('data.0.photos.card_mobile.width', 369);
+        $response->assertJsonPath('data.0.photos.card_mobile.height', 261);
         $response->assertJsonPath('data.0.photos.card_mobile.url', config('app.url').'/media/apartments/a4-card-mobile.jpg');
         $response->assertJsonPath('data.0.url', '/apartamenty/a4');
     }

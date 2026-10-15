@@ -63,11 +63,14 @@ class PhotoStore
         }
         $name = $role.'-'.Str::lower(Str::random(6)).'.'.$extension;
         $path = Storage::disk('media')->putFileAs($this->folder($owner), $file, $name);
+        $size = @getimagesize(Storage::disk('media')->path($path)) ?: [null, null];
 
         return $owner->photos()->create([
             'role' => $role,
             'path' => $path,
             'alt' => $alt ?: null,
+            'width' => $size[0],
+            'height' => $size[1],
             'sort_order' => $sort,
         ]);
     }

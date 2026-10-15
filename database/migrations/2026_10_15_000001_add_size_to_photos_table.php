@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/* Размер фотографии в точках: сайту нужен, чтобы отвести место до загрузки */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('photos', function (Blueprint $table) {
+            $table->unsignedInteger('width')->nullable()->after('alt');
+            $table->unsignedInteger('height')->nullable()->after('width');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('photos', function (Blueprint $table) {
+            $table->dropColumn(['width', 'height']);
+        });
+    }
+};
