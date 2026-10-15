@@ -33,6 +33,7 @@ class ApartmentCardResource extends JsonResource
                 'living' => $this->show_living,
                 'renting' => $this->show_renting,
                 'newbuilds' => $this->show_newbuilds,
+                'home' => $this->show_home,
             ],
             'photos' => [
                 'card' => PhotoResource::make($this->photo(Photo::ROLE_CARD)),

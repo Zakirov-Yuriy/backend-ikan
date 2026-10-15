@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Apartment;
+use App\Models\HomePage;
+use App\Models\HomeRow;
 use App\Models\Photo;
-use App\Models\Restaurant;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -12,18 +14,24 @@ use Illuminate\Support\Str;
 /*
  * Загрузка и удаление фотографий объекта на диске media.
  * Файл кладётся в папку объекта: apartments/a4/card-k3j9x2.jpg.
- * Роли с одной фотографией (card, card_mobile, mobile) заменяются,
- * галерея (gallery) дополняется в конец.
+ * Роли с одной фотографией (card, card_mobile, mobile, photo, photo_wide,
+ * consultation) заменяются, галерея (gallery) дополняется в конец.
  */
 class PhotoStore
 {
-    public function folder(Apartment|Restaurant $owner): string
+    /* Папка владельца на диске media: апартамент, ресторан, главная, строка главной */
+    public function folder(Model $owner): string
     {
-        return $owner instanceof Apartment ? 'apartments/'.$owner->slug : 'restaurant';
+        return match (true) {
+            $owner instanceof Apartment => 'apartments/'.$owner->slug,
+            $owner instanceof HomeRow => 'home/'.$owner->kind.'-'.$owner->id,
+            $owner instanceof HomePage => 'home',
+            default => 'restaurant',
+        };
     }
 
     /* Ставит одну фотографию роли, старую удаляет с диска */
-    public function replace(Apartment|Restaurant $owner, string $role, UploadedFile $file, ?string $alt = null): Photo
+    public function replace(Model $owner, string $role, UploadedFile $file, ?string $alt = null): Photo
     {
         foreach ($owner->photos()->where('role', $role)->get() as $old) {
             $this->delete($old);
@@ -33,7 +41,7 @@ class PhotoStore
     }
 
     /* Добавляет фотографию в галерею в конец */
-    public function append(Apartment|Restaurant $owner, UploadedFile $file, ?string $alt = null): Photo
+    public function append(Model $owner, UploadedFile $file, ?string $alt = null): Photo
     {
         $last = (int) $owner->photos()->where('role', Photo::ROLE_GALLERY)->max('sort_order');
 
@@ -47,7 +55,7 @@ class PhotoStore
     }
 
     /* Удаляет все фотографии объекта вместе с папкой */
-    public function deleteAll(Apartment|Restaurant $owner): void
+    public function deleteAll(Model $owner): void
     {
         foreach ($owner->photos()->get() as $photo) {
             $this->delete($photo);
@@ -55,7 +63,7 @@ class PhotoStore
         Storage::disk('media')->deleteDirectory($this->folder($owner));
     }
 
-    private function add(Apartment|Restaurant $owner, string $role, UploadedFile $file, ?string $alt, int $sort): Photo
+    private function add(Model $owner, string $role, UploadedFile $file, ?string $alt, int $sort): Photo
     {
         $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
         if ($extension === 'jpeg') {

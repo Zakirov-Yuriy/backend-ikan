@@ -43,6 +43,21 @@
             </a>
         </li>
 
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">Страницы сайта</span></li>
+
+        <li class="menu-item{{ Menu::active(['admin.home-page', 'admin.home-rows']) ? ' active' : '' }}">
+            <a href="{{ route('admin.home-page.edit') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-window-alt"></i>
+                <div>Главная сайта</div>
+            </a>
+        </li>
+        <li class="menu-item{{ Menu::active('admin.pages') ? ' active' : '' }}">
+            <a href="{{ route('admin.pages.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-list-ul"></i>
+                <div>Страницы списков</div>
+            </a>
+        </li>
+
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Клиенты</span></li>
 
         @php $newLeads = \App\Models\Lead::query()->fresh()->count(); @endphp

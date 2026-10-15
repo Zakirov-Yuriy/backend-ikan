@@ -36,8 +36,8 @@
         var token = csrf ? csrf.content : (document.querySelector('input[name="_token"]') || {}).value;
 
         /* Порядок строк в таблицах: перетащил, порядок ушёл на сервер формой */
-        var sortable = document.getElementById('sortable');
-        if (sortable && window.jQuery && jQuery.fn.sortable) {
+        document.querySelectorAll('#sortable, .js-sortable').forEach(function (sortable) {
+            if (!window.jQuery || !jQuery.fn.sortable) return;
             jQuery(sortable).sortable({
                 handle: '.js-handle',
                 axis: 'y',
@@ -61,7 +61,7 @@
                     form.submit();
                 }
             });
-        }
+        });
 
         /* Порядок фотографий галереи: перетаскивание, порядок уходит вместе с формой */
         var gallery = document.getElementById('gallerySortable');
@@ -117,6 +117,40 @@
             list.addEventListener('click', function (event) {
                 var button = event.target.closest('.js-remove-pair');
                 if (button) button.closest('.js-pair').remove();
+            });
+        });
+
+        /* Строки по шаблону <template> («Преимущества» на главной): добавить и убрать */
+        document.querySelectorAll('.js-rows').forEach(function (block) {
+            var list = block.querySelector('.js-rows-list');
+            var template = block.querySelector('template');
+            block.querySelector('.js-add-row').addEventListener('click', function () {
+                var index = list.querySelectorAll('.js-row').length;
+                list.insertAdjacentHTML('beforeend', template.innerHTML.replace(/__INDEX__/g, index));
+                var field = list.lastElementChild.querySelector('input[type="text"]');
+                if (field) field.focus();
+            });
+            list.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-remove-row');
+                if (button) button.closest('.js-row').remove();
+            });
+        });
+
+        /*
+         * Адрес ссылки: список страниц подставляет адрес в текстовое поле,
+         * «Другой адрес...» показывает поле, чтобы вписать свой.
+         */
+        document.querySelectorAll('.js-link').forEach(function (block) {
+            var select = block.querySelector('.js-link-select');
+            var input = block.querySelector('.js-link-custom');
+            select.addEventListener('change', function () {
+                if (select.value === 'custom') {
+                    input.classList.remove('d-none');
+                    input.focus();
+                } else {
+                    input.value = select.value;
+                    input.classList.add('d-none');
+                }
             });
         });
 

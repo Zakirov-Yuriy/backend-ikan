@@ -20,7 +20,7 @@ class Apartment extends Model
 
     protected $fillable = [
         'slug', 'name', 'complex_id', 'status',
-        'show_living', 'show_renting', 'show_newbuilds',
+        'show_living', 'show_renting', 'show_newbuilds', 'show_home',
         'city', 'floor', 'type', 'area', 'price', 'card_text',
         'meta_title', 'meta_description', 'description', 'description_short',
         'info_note', 'about_title', 'about_text', 'features', 'data_items',
@@ -34,6 +34,7 @@ class Apartment extends Model
             'show_living' => 'boolean',
             'show_renting' => 'boolean',
             'show_newbuilds' => 'boolean',
+            'show_home' => 'boolean',
             'area' => 'decimal:2',
             'price' => 'integer',
             'features' => 'array',
@@ -55,6 +56,12 @@ class Apartment extends Model
     public function photo(string $role): ?Photo
     {
         return $this->photos->firstWhere('role', $role);
+    }
+
+    /* Карточки блока «Актуальные объекты» на главной */
+    public function scopeOnHome(Builder $query): Builder
+    {
+        return $query->where('show_home', true);
     }
 
     /* Отбор по каталогу сайта: living, renting, newbuilds */

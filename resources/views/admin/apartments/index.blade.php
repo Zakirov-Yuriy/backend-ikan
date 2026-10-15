@@ -68,7 +68,7 @@
                                 <td>{{ $apartment->price === null ? '' : number_format($apartment->price, 0, '', ' ').' €' }}</td>
                                 <td><span class="badge {{ $apartment->status->value === 'ready' ? 'bg-label-success' : 'bg-label-warning' }}">{{ $apartment->status->label() }}</span></td>
                                 <td>
-                                    @foreach(['show_living' => 'для себя', 'show_renting' => 'аренда', 'show_newbuilds' => 'новостройки'] as $field => $label)
+                                    @foreach(['show_living' => 'для себя', 'show_renting' => 'аренда', 'show_newbuilds' => 'новостройки', 'show_home' => 'главная'] as $field => $label)
                                         @if($apartment->$field)<span class="badge bg-label-info me-1">{{ $label }}</span>@endif
                                     @endforeach
                                 </td>

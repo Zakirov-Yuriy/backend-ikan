@@ -67,6 +67,11 @@
                                             <label class="form-check-label" for="{{ $field }}">{{ $label }}</label>
                                         </div>
                                     @endforeach
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="show_home" id="show_home" value="1" @checked(old('show_home', $apartment->show_home))>
+                                        <label class="form-check-label" for="show_home">На главной, в «Актуальных объектах»</label>
+                                    </div>
+                                    <div class="form-text">На главной карточки стоят в том же порядке, что в списке апартаментов; на компьютере в ряд помещаются три.</div>
                                 </div>
                             </div>
 

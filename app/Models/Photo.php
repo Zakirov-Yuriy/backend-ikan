@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
 
-/* Фотография апартамента или ресторана, см. миграцию photos */
+/* Фотография апартамента, ресторана или главной страницы, см. миграцию photos */
 class Photo extends Model
 {
     public const ROLE_CARD = 'card';
@@ -16,6 +16,13 @@ class Photo extends Model
     public const ROLE_GALLERY = 'gallery';
 
     public const ROLE_MOBILE = 'mobile';
+
+    /* Главная: фотография строки или карточки, широкий кадр строки для компьютера, фон блока подбора */
+    public const ROLE_PHOTO = 'photo';
+
+    public const ROLE_PHOTO_WIDE = 'photo_wide';
+
+    public const ROLE_CONSULTATION = 'consultation';
 
     protected $fillable = ['role', 'path', 'alt', 'width', 'height', 'sort_order'];
 

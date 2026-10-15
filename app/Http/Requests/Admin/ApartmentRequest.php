@@ -23,6 +23,7 @@ class ApartmentRequest extends FormRequest
             'show_living' => $this->boolean('show_living'),
             'show_renting' => $this->boolean('show_renting'),
             'show_newbuilds' => $this->boolean('show_newbuilds'),
+            'show_home' => $this->boolean('show_home'),
         ]);
     }
 
@@ -39,6 +40,7 @@ class ApartmentRequest extends FormRequest
             'show_living' => ['boolean'],
             'show_renting' => ['boolean'],
             'show_newbuilds' => ['boolean'],
+            'show_home' => ['boolean'],
             'city' => ['nullable', 'string', 'max:100'],
             'floor' => ['nullable', 'string', 'max:100'],
             'type' => ['nullable', 'string', 'max:100'],

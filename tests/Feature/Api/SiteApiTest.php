@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Apartment;
+use App\Models\HomePage;
 use Database\Seeders\SiteContentSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
@@ -81,18 +83,58 @@ class SiteApiTest extends TestCase
         $response->assertJsonPath('data.photo_mobile.url', config('app.url').'/media/restaurant/photo-mobile.jpg');
     }
 
+    public function test_home(): void
+    {
+        $response = $this->getJson('/api/home')->assertOk();
+        $response->assertJsonPath('data.hero.title', 'Пространство для жизни.');
+        $response->assertJsonPath('data.hero.primary_label', 'Смотреть объекты');
+        $response->assertJsonCount(3, 'data.hero.side_items');
+        $response->assertJsonCount(5, 'data.scenarios');
+        $response->assertJsonPath('data.scenarios.0.link.href', '/dlya-sebya');
+        $response->assertJsonPath('data.scenarios.0.photo_wide.url', config('app.url').'/media/home/scenario-01-wide.jpg');
+        $response->assertJsonPath('data.scenarios.1.photo_wide', null);
+        $response->assertJsonPath('data.scenarios.4.photo.url', config('app.url').'/media/home/scenario-05.jpg');
+        $response->assertJsonCount(4, 'data.about.features');
+        $response->assertJsonPath('data.about.features.1.icon', 'shield');
+        $response->assertJsonCount(4, 'data.directions.items');
+        $response->assertJsonPath('data.directions.items.3.href', '/investitsii');
+        /* «Актуальные объекты»: апартаменты с галочкой, в порядке списка апартаментов */
+        $response->assertJsonCount(3, 'data.objects.items');
+        $response->assertJsonPath('data.objects.items.0.slug', 'a4');
+        $response->assertJsonPath('data.objects.items.0.photos.card.url', config('app.url').'/media/apartments/a4-card.jpg');
+        $response->assertJsonPath('data.objects.all.label', 'Весь каталог');
+        $response->assertJsonPath('data.consultation.photo.url', config('app.url').'/media/home/consultation.jpg');
+
+        Apartment::query()->where('slug', 'a6')->update(['show_home' => false]);
+        $this->getJson('/api/home')->assertJsonCount(2, 'data.objects.items');
+    }
+
+    public function test_pages(): void
+    {
+        $this->getJson('/api/pages/living')->assertOk()
+            ->assertJsonPath('data.title', 'Квартиры для собственного проживания')
+            ->assertJsonPath('data.url', '/dlya-sebya')
+            ->assertJsonPath('data.consultation.title', 'Подберём объект под ваши цели', 'пустой заголовок: как на главной')
+            ->assertJsonPath('data.consultation.title_mobile', 'Подберём жильё для вашей семьи');
+        $this->getJson('/api/pages/newbuilds')->assertOk()
+            ->assertJsonPath('data.consultation.title', 'Войти в проект на выгодном этапе');
+        $this->getJson('/api/pages/nope')->assertNotFound();
+    }
+
     public function test_seeder_runs_twice_without_duplicates(): void
     {
         $this->seed(SiteContentSeeder::class);
         $this->getJson('/api/complexes')->assertJsonCount(4, 'data');
         $this->getJson('/api/apartments')->assertJsonCount(3, 'data');
         $this->getJson('/api/apartments/a4')->assertJsonCount(4, 'data.gallery');
+        $this->getJson('/api/home')->assertJsonCount(5, 'data.scenarios')->assertJsonCount(4, 'data.directions.items');
+        $this->assertSame(1, HomePage::query()->count());
     }
 
     /* Файлы в public/media отдаёт веб-сервер, не Laravel; здесь проверка, что они на месте */
     public function test_photo_files_are_copied_to_media_disk(): void
     {
-        foreach (['apartments/a4-card.jpg', 'apartments/a4-01.jpg', 'restaurant/photo-mobile.jpg'] as $path) {
+        foreach (['apartments/a4-card.jpg', 'apartments/a4-01.jpg', 'restaurant/photo-mobile.jpg', 'home/consultation.jpg'] as $path) {
             $this->assertTrue(Storage::disk('media')->exists($path), $path);
         }
         $this->assertSame(

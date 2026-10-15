@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Storage;
 
 /*
  * Загружает в базу то, что сейчас записано в файлах сайта (content/*.ts):
- * четыре ЖК, апартаменты A4, A6, A10 и страницу ресторана. Фотографии
- * копируются из database/seeders/media на диск media (public/media).
+ * четыре ЖК, апартаменты A4, A6, A10, страницу ресторана, а через HomeSeeder
+ * главную и вступления списков. Фотографии копируются из
+ * database/seeders/media на диск media (public/media).
  *
  * Запуск повторный безопасен: записи ищутся по slug и обновляются, лишние
  * не удаляются. Полная пересборка: php artisan migrate:fresh --seed.
@@ -30,6 +31,7 @@ class SiteContentSeeder extends Seeder
         $complexes = $this->complexes();
         $this->apartments($complexes);
         $this->restaurant();
+        $this->call(HomeSeeder::class);
     }
 
     /* Копирует картинки в public/media, существующие перезаписывает */
