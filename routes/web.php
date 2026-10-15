@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApartmentController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ComplexController;
 use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\Admin\RestaurantController;
 use Illuminate\Support\Facades\Route;
 
 /* Корень бэкенда ведёт в админку */
@@ -22,5 +23,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::post('apartments/sort', [ApartmentController::class, 'sort'])->name('apartments.sort');
         Route::resource('apartments', ApartmentController::class)->except('show');
+
+        Route::get('restaurant', [RestaurantController::class, 'edit'])->name('restaurant.edit');
+        Route::put('restaurant', [RestaurantController::class, 'update'])->name('restaurant.update');
     });
 });

@@ -36,5 +36,11 @@
                 <div>Апартаменты</div>
             </a>
         </li>
+        <li class="menu-item{{ Menu::active('admin.restaurant') ? ' active' : '' }}">
+            <a href="{{ route('admin.restaurant.edit') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-restaurant"></i>
+                <div>Ресторан</div>
+            </a>
+        </li>
     </ul>
 </aside>

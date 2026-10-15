@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -18,6 +19,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo('/admin');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        /* Слишком большая отправка (лимит post_max_size в PHP): назад к форме с текстом */
+        $exceptions->render(function (PostTooLargeException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return null;
+            }
+
+            return back()->withErrors('Файлы слишком большие для одной отправки (сервер принимает до 8 МБ за раз). Выберите меньше файлов и повторите.');
+        });
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

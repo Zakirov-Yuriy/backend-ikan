@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    /* Адрес сайта на Next.js: для ссылок «Открыть на сайте» в админке */
+    'site_url' => rtrim((string) env('SITE_URL', 'http://localhost:3000'), '/'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

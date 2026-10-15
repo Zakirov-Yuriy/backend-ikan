@@ -10,9 +10,9 @@
     use App\Models\Photo;
     $v = fn (string $field) => old($field, $apartment->$field);
     $single = [
-        'photo_card' => ['role' => Photo::ROLE_CARD, 'label' => 'Фото карточки (компьютер)', 'hint' => 'В списках на компьютере, кадр примерно 4:3'],
-        'photo_card_mobile' => ['role' => Photo::ROLE_CARD_MOBILE, 'label' => 'Фото карточки (телефон)', 'hint' => 'В списках на телефоне, кадр примерно 3:2'],
-        'photo_mobile' => ['role' => Photo::ROLE_MOBILE, 'label' => 'Фото страницы (телефон)', 'hint' => 'Вверху страницы апартамента на телефоне'],
+        'photo_card' => ['role' => Photo::ROLE_CARD, 'label' => 'Фото карточки (компьютер)', 'hint' => 'В списках на компьютере, кадр примерно 4:3.'],
+        'photo_card_mobile' => ['role' => Photo::ROLE_CARD_MOBILE, 'label' => 'Фото карточки (телефон)', 'hint' => 'В списках на телефоне, кадр примерно 3:2.'],
+        'photo_mobile' => ['role' => Photo::ROLE_MOBILE, 'label' => 'Фото страницы (телефон)', 'hint' => 'Вверху страницы апартамента на телефоне.'],
     ];
     $gallery = $apartment->exists ? $apartment->photos->where('role', Photo::ROLE_GALLERY)->values() : collect();
     $items = old('data_items', $apartment->data_items ?? []);
@@ -137,16 +137,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Блок «Данные»: подпись и значение</label>
-                                    <div id="dataItems">
-                                        @foreach(array_merge(array_values($items), count($items) < 3 ? array_fill(0, 3 - count($items), ['label' => '', 'value' => '']) : []) as $i => $item)
-                                            <div class="input-group mb-2 js-data-item">
-                                                <input type="text" class="form-control" name="data_items[{{ $i }}][label]" placeholder="Меблировка" maxlength="100" value="{{ $item['label'] ?? '' }}"/>
-                                                <input type="text" class="form-control" name="data_items[{{ $i }}][value]" placeholder="Полностью меблирован" maxlength="255" value="{{ $item['value'] ?? '' }}"/>
-                                                <button type="button" class="btn btn-outline-danger js-remove-item" title="Убрать строку"><i class="bx bx-x"></i></button>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="addDataItem"><i class="bx bx-plus me-1"></i>Ещё строка</button>
+                                    @include('admin.partials.pairs', ['name' => 'data_items', 'rows' => $items, 'labelPlaceholder' => 'Меблировка', 'valuePlaceholder' => 'Полностью меблирован', 'min' => 3])
                                 </div>
                             </div>
 
@@ -173,48 +164,9 @@
                                 <p class="text-muted">Фотографии можно добавить сразу или после сохранения.</p>
                             @endif
                             @foreach($single as $field => $meta)
-                                @php $photo = $apartment->exists ? $apartment->photo($meta['role']) : null; @endphp
-                                <div class="mb-4 js-photo-field">
-                                    <label for="{{ $field }}" class="form-label">{{ $meta['label'] }}</label>
-                                    @if($photo)
-                                        <div class="ikan-photo mb-2">
-                                            <img src="{{ $photo->url() }}" alt="{{ $photo->alt }}" class="rounded w-100">
-                                            <input type="text" class="form-control form-control-sm mt-2" name="photo_alt[{{ $photo->id }}]" maxlength="255" placeholder="Подпись для незрячих и поиска" value="{{ $photo->alt }}"/>
-                                            <div class="form-check mt-2">
-                                                <input class="form-check-input" type="checkbox" name="delete_photo[]" value="{{ $photo->id }}" id="delete_{{ $photo->id }}">
-                                                <label class="form-check-label text-danger" for="delete_{{ $photo->id }}">Удалить это фото</label>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    <input class="form-control js-preview-input" type="file" accept="image/*" id="{{ $field }}" name="{{ $field }}">
-                                    <div class="form-text">{{ $meta['hint'] }}. {{ $photo ? 'Новый файл заменит текущий.' : '' }}</div>
-                                    <img class="js-preview rounded w-100 mt-2 d-none" alt="">
-                                </div>
+                                @include('admin.partials.single-photo', ['field' => $field, 'photo' => $apartment->exists ? $apartment->photo($meta['role']) : null, 'label' => $meta['label'], 'hint' => $meta['hint']])
                             @endforeach
-
-                            <div class="divider text-start"><div class="divider-text">Галерея страницы</div></div>
-                            <p class="form-text mt-0">Четыре первых фото стоят вверху страницы на компьютере. Перетащите, чтобы поменять порядок.</p>
-                            @if($gallery->isNotEmpty())
-                                <div id="gallerySortable" class="list-group mb-3">
-                                    @foreach($gallery as $photo)
-                                        <div class="list-group-item d-flex align-items-center gap-2 js-gallery-item" data-id="{{ $photo->id }}">
-                                            <i class="bx bx-grid-vertical js-handle fs-5 text-muted" style="cursor: grab" title="Перетащить"></i>
-                                            <img src="{{ $photo->url() }}" alt="{{ $photo->alt }}" class="rounded flex-shrink-0" style="width: 72px; height: 54px; object-fit: cover">
-                                            <input type="hidden" name="photo_order[]" value="{{ $photo->id }}">
-                                            <div class="flex-grow-1 min-w-0">
-                                                <input type="text" class="form-control form-control-sm" name="photo_alt[{{ $photo->id }}]" maxlength="255" placeholder="Подпись" value="{{ $photo->alt }}"/>
-                                                <div class="form-check mt-1 mb-0">
-                                                    <input class="form-check-input" type="checkbox" name="delete_photo[]" value="{{ $photo->id }}" id="delete_{{ $photo->id }}">
-                                                    <label class="form-check-label text-danger small" for="delete_{{ $photo->id }}">Удалить</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                            <input class="form-control js-preview-input" type="file" accept="image/*" name="gallery[]" id="gallery" multiple>
-                            <div class="form-text">Можно выбрать несколько файлов, они встанут в конец. JPG, PNG или WebP до 10 МБ каждый.</div>
-                            <div class="js-preview-list row g-2 mt-0"></div>
+                            @include('admin.partials.gallery', ['gallery' => $gallery, 'hint' => 'Четыре первых фото стоят вверху страницы на компьютере.'])
                         </div>
                     </div>
 
@@ -222,6 +174,9 @@
                         <div class="card-body d-flex flex-wrap gap-2">
                             <button type="submit" class="btn btn-dark">Сохранить</button>
                             <a href="{{ route('admin.apartments.index') }}" class="btn btn-outline-secondary">К списку</a>
+                            @if($apartment->exists)
+                                <a href="{{ config('app.site_url') }}/apartamenty/{{ $apartment->slug }}" target="_blank" rel="noopener" class="btn btn-outline-secondary">Открыть на сайте</a>
+                            @endif
                             @if($apartment->exists)
                                 <button type="submit" form="deleteForm" class="btn btn-outline-danger ms-auto js-confirm" data-confirm="Удалить «{{ $apartment->name }}» вместе с фотографиями?">Удалить</button>
                             @endif

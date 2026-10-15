@@ -99,25 +99,97 @@
             });
         });
 
-        /* Строки блока «Данные»: добавить и убрать */
-        var items = document.getElementById('dataItems');
-        var add = document.getElementById('addDataItem');
-        if (items && add) {
-            add.addEventListener('click', function () {
-                var index = items.querySelectorAll('.js-data-item').length;
+        /* Строки «подпись и значение»: добавить и убрать (блоки «Данные», «Характеристики») */
+        document.querySelectorAll('.js-pairs').forEach(function (block) {
+            var list = block.querySelector('.js-pairs-list');
+            block.querySelector('.js-add-pair').addEventListener('click', function () {
+                var index = list.querySelectorAll('.js-pair').length;
+                var name = block.dataset.name;
                 var row = document.createElement('div');
-                row.className = 'input-group mb-2 js-data-item';
+                row.className = 'input-group mb-2 js-pair';
                 row.innerHTML =
-                    '<input type="text" class="form-control" name="data_items[' + index + '][label]" placeholder="Подпись" maxlength="100">' +
-                    '<input type="text" class="form-control" name="data_items[' + index + '][value]" placeholder="Значение" maxlength="255">' +
-                    '<button type="button" class="btn btn-outline-danger js-remove-item" title="Убрать строку"><i class="bx bx-x"></i></button>';
-                items.appendChild(row);
+                    '<input type="text" class="form-control" name="' + name + '[' + index + '][label]" placeholder="' + (block.dataset.labelPlaceholder || '') + '" maxlength="100">' +
+                    '<input type="text" class="form-control" name="' + name + '[' + index + '][value]" placeholder="' + (block.dataset.valuePlaceholder || '') + '" maxlength="255">' +
+                    '<button type="button" class="btn btn-outline-danger js-remove-pair" title="Убрать строку"><i class="bx bx-x"></i></button>';
+                list.appendChild(row);
                 row.querySelector('input').focus();
             });
-            items.addEventListener('click', function (event) {
-                var button = event.target.closest('.js-remove-item');
-                if (button) button.closest('.js-data-item').remove();
+            list.addEventListener('click', function (event) {
+                var button = event.target.closest('.js-remove-pair');
+                if (button) button.closest('.js-pair').remove();
+            });
+        });
+
+        /*
+         * Уменьшение фотографий в браузере перед отправкой. Большие снимки с
+         * телефона (3..10 МБ) уменьшаются до 2000 px по длинной стороне и
+         * пережимаются в JPEG; на сервер уходит лёгкий файл. PNG остаётся PNG.
+         * Поворот по EXIF учитывается браузером при чтении (imageOrientation).
+         * Если что-то не вышло, файл уходит как есть.
+         */
+        var MAX_SIDE = 2000;
+        function shrinkFile(file) {
+            if (!file.type || file.type.indexOf('image/') !== 0 || file.type === 'image/gif' || file.type === 'image/svg+xml') {
+                return Promise.resolve(file);
+            }
+            var read = window.createImageBitmap
+                ? createImageBitmap(file, { imageOrientation: 'from-image' })
+                : Promise.reject(new Error('no createImageBitmap'));
+            return read.then(function (bitmap) {
+                var w = bitmap.width, h = bitmap.height;
+                var scale = Math.min(1, MAX_SIDE / Math.max(w, h));
+                if (scale === 1 && file.size < 1024 * 1024) {
+                    bitmap.close && bitmap.close();
+                    return file;
+                }
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(w * scale);
+                canvas.height = Math.round(h * scale);
+                canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+                bitmap.close && bitmap.close();
+                var png = file.type === 'image/png';
+                return new Promise(function (resolve) {
+                    canvas.toBlob(function (blob) {
+                        if (!blob || blob.size >= file.size) return resolve(file);
+                        var name = file.name.replace(/\.[^.]+$/, '') + (png ? '.png' : '.jpg');
+                        resolve(new File([blob], name, { type: blob.type, lastModified: Date.now() }));
+                    }, png ? 'image/png' : 'image/jpeg', 0.85);
+                });
+            }).catch(function () { return file; });
+        }
+
+        var shrinking = 0;
+        function setBusy(form, busy) {
+            form.querySelectorAll('button[type="submit"]').forEach(function (button) {
+                button.disabled = busy;
             });
         }
+        document.querySelectorAll('input[type="file"].js-shrink').forEach(function (input) {
+            input.addEventListener('change', function () {
+                var files = Array.prototype.slice.call(input.files || []);
+                if (!files.length) return;
+                var form = input.form;
+                shrinking++;
+                if (form) setBusy(form, true);
+                Promise.all(files.map(shrinkFile)).then(function (result) {
+                    var transfer = new DataTransfer();
+                    result.forEach(function (f) { transfer.items.add(f); });
+                    input.files = transfer.files;
+                    var total = result.reduce(function (sum, f) { return sum + f.size; }, 0);
+                    var note = input.parentElement.querySelector('.js-shrink-note');
+                    if (!note) {
+                        note = document.createElement('div');
+                        note.className = 'form-text js-shrink-note';
+                        input.insertAdjacentElement('afterend', note);
+                    }
+                    note.textContent = result.length + ' файл(ов), ' + (total / 1024 / 1024).toFixed(1) + ' МБ к отправке' +
+                        (total > 7 * 1024 * 1024 ? '. Это много за один раз: сервер принимает до 8 МБ, выберите меньше файлов' : '');
+                    note.classList.toggle('text-danger', total > 7 * 1024 * 1024);
+                }).finally(function () {
+                    shrinking--;
+                    if (form && shrinking === 0) setBusy(form, false);
+                });
+            });
+        });
     });
 })();
