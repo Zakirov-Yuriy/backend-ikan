@@ -42,5 +42,22 @@
                 <div>Ресторан</div>
             </a>
         </li>
+
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">Клиенты</span></li>
+
+        @php $newLeads = \App\Models\Lead::query()->fresh()->count(); @endphp
+        <li class="menu-item{{ Menu::active('admin.leads') ? ' active' : '' }}">
+            <a href="{{ route('admin.leads.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-envelope"></i>
+                <div>Заявки</div>
+                @if($newLeads)<span class="badge bg-danger rounded-pill ms-auto">{{ $newLeads }}</span>@endif
+            </a>
+        </li>
+        <li class="menu-item{{ Menu::active('admin.settings') ? ' active' : '' }}">
+            <a href="{{ route('admin.settings.edit') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-cog"></i>
+                <div>Настройки</div>
+            </a>
+        </li>
     </ul>
 </aside>

@@ -6,6 +6,7 @@ use App\Enums\ApartmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Apartment;
 use App\Models\Complex;
+use App\Models\Lead;
 use App\Models\Photo;
 use Illuminate\View\View;
 
@@ -20,6 +21,7 @@ class HomeController extends Controller
             'building' => Apartment::query()->where('status', ApartmentStatus::Building)->count(),
             'ready' => Apartment::query()->where('status', ApartmentStatus::Ready)->count(),
             'photos' => Photo::query()->count(),
+            'newLeads' => Lead::query()->fresh()->count(),
             'recent' => Apartment::query()->with('complex')->latest('updated_at')->limit(5)->get(),
         ]);
     }

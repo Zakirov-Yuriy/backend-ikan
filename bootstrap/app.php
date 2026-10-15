@@ -14,6 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        /*
+         * Заявки приходят через сервер сайта, он передаёт адрес посетителя в
+         * X-Forwarded-For. Доверяем этому заголовку, иначе все посетители
+         * считались бы одним адресом (сайта) и упирались бы в общий лимит.
+         */
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR);
+
         /* Без входа любая страница админки ведёт на форму входа */
         $middleware->redirectGuestsTo('/admin/login');
         $middleware->redirectUsersTo('/admin');

@@ -28,6 +28,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /* Бот Telegram для уведомлений о заявках: токен от @BotFather в .env, TELEGRAM_BOT_TOKEN */
+    'telegram' => [
+        'token' => env('TELEGRAM_BOT_TOKEN'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

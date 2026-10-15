@@ -8,8 +8,9 @@
                 ['Апартаменты', $apartments, 'bx-home-alt', route('admin.apartments.index')],
                 ['Строится', $building, 'bx-hard-hat', route('admin.apartments.index')],
                 ['Готово к заселению', $ready, 'bx-check-circle', route('admin.apartments.index')],
+                ['Новые заявки', $newLeads, 'bx-envelope', route('admin.leads.index', ['status' => 'new'])],
             ] as [$label, $count, $icon, $href])
-                <div class="col-sm-6 col-xl-3">
+                <div class="col-sm-6 col-xl">
                     <div class="card h-100">
                         <div class="card-body">
                             <div class="avatar flex-shrink-0 mb-3">
