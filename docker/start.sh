@@ -18,6 +18,14 @@ touch database/database.sqlite
 php artisan migrate --force
 php artisan db:seed --force
 
+# Тестовые апартаменты: DEMO_APARTMENTS=l3 (или l3,l4) в настройках Render.
+# Диск у бесплатного Render не сохраняется, поэтому они создаются при каждом запуске
+if [ -n "$DEMO_APARTMENTS" ]; then
+    for complex in $(echo "$DEMO_APARTMENTS" | tr ',' ' '); do
+        php artisan demo:apartments "$complex" || true
+    done
+fi
+
 # Пользователь админки из настроек Render (ADMIN_EMAIL и ADMIN_PASSWORD)
 if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
     php artisan admin:user "$ADMIN_EMAIL" --password="$ADMIN_PASSWORD"
