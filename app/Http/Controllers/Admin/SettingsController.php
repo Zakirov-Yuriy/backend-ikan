@@ -10,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/* Настройки: телефон на сайте, куда слать уведомления о заявках */
+/* Настройки: телефоны и ссылки соцсетей на сайте, куда слать уведомления о заявках */
 class SettingsController extends Controller
 {
     public function __construct(private readonly LeadNotifier $notifier) {}
@@ -19,6 +19,8 @@ class SettingsController extends Controller
     {
         return view('admin.settings.form', [
             'phone' => Setting::get(Setting::PHONE, Setting::DEFAULT_PHONE),
+            'phone2' => Setting::phone2(),
+            'socials' => collect(Setting::SOCIALS)->map(fn ($item, $name) => $item + ['value' => Setting::socials()[$name]]),
             'notifyEmails' => Setting::get(Setting::NOTIFY_EMAILS, ''),
             'telegramChatId' => Setting::get(Setting::TELEGRAM_CHAT_ID, ''),
             'telegramToken' => (string) config('services.telegram.token') !== '',
@@ -31,18 +33,32 @@ class SettingsController extends Controller
     {
         $data = $request->validate([
             'phone' => ['required', 'string', 'max:30', 'regex:/^\+?[\d\s()\-]+$/'],
+            'phone_2' => ['nullable', 'string', 'max:30', 'regex:/^\+?[\d\s()\-]+$/'],
+            'social_max' => ['nullable', 'string', 'max:300', 'url:http,https'],
+            'social_telegram' => ['nullable', 'string', 'max:300', 'url:http,https'],
+            'social_vk' => ['nullable', 'string', 'max:300', 'url:http,https'],
             'notify_emails' => ['nullable', 'string', 'max:500'],
             'telegram_chat_id' => ['nullable', 'string', 'max:50', 'regex:/^-?\d+$/'],
         ], [
             'phone.regex' => 'Телефон: цифры, пробелы, скобки, дефис и плюс в начале, например +7 (991) 255-29-00.',
+            'phone_2.regex' => 'Второй телефон: цифры, пробелы, скобки, дефис и плюс в начале, например +7 (991) 587-24-57.',
+            'url' => 'Ссылка :attribute должна начинаться с https:// или http://.',
             'telegram_chat_id.regex' => 'Chat id в Telegram это число, например 123456789 или -1001234567890. Нажмите «Найти chat id» ниже.',
         ], [
             'phone' => '«телефон»',
+            'phone_2' => '«второй телефон»',
+            'social_max' => '«MAX»',
+            'social_telegram' => '«Telegram»',
+            'social_vk' => '«ВКонтакте»',
             'notify_emails' => '«почта для уведомлений»',
             'telegram_chat_id' => '«chat id в Telegram»',
         ]);
         if (strlen(preg_replace('/\D/', '', $data['phone'])) < 6) {
             return back()->withInput()->withErrors('В телефоне слишком мало цифр.');
+        }
+        $phone2 = trim((string) ($data['phone_2'] ?? ''));
+        if ($phone2 !== '' && strlen(preg_replace('/\D/', '', $phone2)) < 6) {
+            return back()->withInput()->withErrors('Во втором телефоне слишком мало цифр.');
         }
 
         $raw = (string) ($data['notify_emails'] ?? '');
@@ -52,6 +68,10 @@ class SettingsController extends Controller
         }
 
         Setting::set(Setting::PHONE, trim($data['phone']));
+        Setting::set(Setting::PHONE_2, $phone2);
+        foreach (Setting::SOCIALS as $item) {
+            Setting::set($item['key'], trim((string) ($data[$item['key']] ?? '')));
+        }
         Setting::set(Setting::NOTIFY_EMAILS, trim($raw));
         Setting::set(Setting::TELEGRAM_CHAT_ID, trim((string) ($data['telegram_chat_id'] ?? '')));
 

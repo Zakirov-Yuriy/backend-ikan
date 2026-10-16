@@ -13,8 +13,22 @@
                             <div class="mb-4">
                                 <label for="phone" class="form-label">Телефон на сайте*</label>
                                 <input type="text" class="form-control" name="phone" id="phone" maxlength="30" required placeholder="+7 (991) 255-29-00" value="{{ old('phone', $phone) }}"/>
-                                <div class="form-text">Один телефон везде: в шапке, в подвале, на кнопках «Позвонить» и в текстах форм. Пишется так, как должен выглядеть на сайте.</div>
+                                <div class="form-text">Главный телефон: на него звонят кнопки «Позвонить». В шапке, подвале, меню и текстах форм он стоит первым. Пишется так, как должен выглядеть на сайте.</div>
                             </div>
+                            <div class="mb-4">
+                                <label for="phone_2" class="form-label">Второй телефон</label>
+                                <input type="text" class="form-control" name="phone_2" id="phone_2" maxlength="30" placeholder="+7 (991) 587-24-57" value="{{ old('phone_2', $phone2) }}"/>
+                                <div class="form-text">Показывается рядом с главным везде, где телефон написан текстом. Если оставить пустым, на сайте будет один телефон.</div>
+                            </div>
+
+                            <div class="divider text-start"><div class="divider-text">Иконки в подвале сайта</div></div>
+                            @foreach($socials as $item)
+                                <div class="mb-3">
+                                    <label for="{{ $item['key'] }}" class="form-label">{{ $item['label'] }}</label>
+                                    <input type="url" class="form-control" name="{{ $item['key'] }}" id="{{ $item['key'] }}" maxlength="300" placeholder="{{ $item['default'] }}" value="{{ old($item['key'], $item['value']) }}"/>
+                                </div>
+                            @endforeach
+                            <div class="form-text mb-4">Ссылка открывается в новой вкладке по нажатию на иконку. Если поле пустое, иконка на сайте не показывается.</div>
 
                             <div class="divider text-start"><div class="divider-text">Уведомления о заявках</div></div>
                             <div class="mb-4">
