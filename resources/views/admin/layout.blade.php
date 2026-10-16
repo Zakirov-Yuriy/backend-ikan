@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/css/theme-default.css') }}" class="template-customizer-theme-css"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/css/style.css') }}"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/css/dark-theme.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('admin_front/assets/css/ikan.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('admin_front/assets/css/ikan.css') }}?v=16-10"/>
     {{-- Тёмная тема: класс ставится до отрисовки, чтобы не было вспышки светлого фона --}}
     <script>
         (function () {

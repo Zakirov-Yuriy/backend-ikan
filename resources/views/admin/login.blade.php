@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/css/core.css') }}" class="template-customizer-core-css"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/vendor/css/theme-default.css') }}" class="template-customizer-theme-css"/>
     <link rel="stylesheet" href="{{ asset('admin_front/assets/css/style.css') }}"/>
-    <link rel="stylesheet" href="{{ asset('admin_front/assets/css/ikan.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('admin_front/assets/css/ikan.css') }}?v=16-10"/>
 </head>
 <body>
 <div class="m-auto container d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
