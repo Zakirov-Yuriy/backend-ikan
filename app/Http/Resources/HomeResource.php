@@ -21,7 +21,7 @@ class HomeResource extends JsonResource
     {
         /* Списки строк отдаются массивами: тогда пустые фотографии становятся null, а не {} */
         $rows = HomeRow::query()->with('photos')->ordered()->get();
-        $objects = Apartment::query()->with(['complex', 'photos'])->onHome()->ordered()->get();
+        $objects = Apartment::homeObjects();
 
         return [
             'meta' => [

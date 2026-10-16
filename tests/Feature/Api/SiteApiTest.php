@@ -108,6 +108,20 @@ class SiteApiTest extends TestCase
 
         Apartment::query()->where('slug', 'a6')->update(['show_home' => false]);
         $this->getJson('/api/home')->assertJsonCount(2, 'data.objects.items');
+
+        /* Не больше трёх (16.10): четыре с галочкой, на главной первые три по порядку */
+        Apartment::query()->update(['show_home' => true]);
+        $this->artisan('demo:apartments', ['complex' => 'l3', '--count' => 2])->assertSuccessful();
+        Apartment::query()->update(['show_home' => true]);
+        Apartment::query()->where('slug', 'a4')->update(['sort_order' => 100]);
+        $slugs = collect($this->getJson('/api/home')->assertJsonCount(3, 'data.objects.items')->json('data.objects.items'))->pluck('slug')->all();
+        $this->assertNotContains('a4', $slugs);
+        $this->assertSame(Apartment::query()->ordered()->limit(3)->pluck('slug')->all(), $slugs);
+
+        /* Без галочек: первые три из общего списка */
+        Apartment::query()->update(['show_home' => false]);
+        $slugs = collect($this->getJson('/api/home')->assertJsonCount(3, 'data.objects.items')->json('data.objects.items'))->pluck('slug')->all();
+        $this->assertSame(Apartment::query()->ordered()->limit(3)->pluck('slug')->all(), $slugs);
     }
 
     public function test_pages(): void

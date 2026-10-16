@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ApartmentStatus;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -62,6 +63,24 @@ class Apartment extends Model
     public function scopeOnHome(Builder $query): Builder
     {
         return $query->where('show_home', true);
+    }
+
+    /* Сколько карточек в «Актуальных объектах» на главной (Анна, 16.10) */
+    public const HOME_LIMIT = 3;
+
+    /**
+     * Карточки «Актуальных объектов»: первые три с галочкой «На главной» в
+     * порядке списка апартаментов. Если галочки нет ни у одного, первые три
+     * из общего списка, чтобы блок не был пустым.
+     *
+     * @return Collection<int, Apartment>
+     */
+    public static function homeObjects(): Collection
+    {
+        $query = fn () => static::query()->with(['complex', 'photos'])->ordered()->limit(self::HOME_LIMIT);
+        $flagged = $query()->onHome()->get();
+
+        return $flagged->isNotEmpty() ? $flagged : $query()->get();
     }
 
     /* Отбор по каталогу сайта: living, renting, newbuilds */

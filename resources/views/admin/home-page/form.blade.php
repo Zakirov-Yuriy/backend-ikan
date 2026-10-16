@@ -237,15 +237,15 @@
             </div>
             <div class="card-body">
                 @if($objects->isEmpty())
-                    <p class="mb-0">Пока ни у одного апартамента нет галочки «На главной, в «Актуальных объектах»». Поставьте её в форме апартамента.</p>
+                    <p class="mb-0">Пока ни у одного апартамента нет галочки «На главной, в «Актуальных объектах»», поэтому на сайте первые {{ $homeLimit }} из общего списка апартаментов. Чтобы выбрать самим, поставьте галочку в форме апартамента.</p>
                 @else
-                    <p class="text-muted mb-0">Апартаменты с галочкой «На главной» в форме апартамента, в порядке списка апартаментов. Карточка берёт фото, цену и описание апартамента.</p>
+                    <p class="text-muted mb-0">На сайте до {{ $homeLimit }} карточек: первые апартаменты с галочкой «На главной» в порядке списка апартаментов (порядок меняется перетаскиванием в списке). Карточка берёт фото, цену и описание апартамента.</p>
                 @endif
             </div>
             @if($objects->isNotEmpty())
                 <div class="table-responsive text-nowrap">
                     <table class="table">
-                        <thead class="table-light"><tr><th>Апартамент</th><th>ЖК</th><th>Стадия</th><th>Цена</th><th></th></tr></thead>
+                        <thead class="table-light"><tr><th>Апартамент</th><th>ЖК</th><th>Стадия</th><th>Цена</th><th>На сайте</th><th></th></tr></thead>
                         <tbody class="table-border-bottom-0">
                         @foreach($objects as $apartment)
                             <tr>
@@ -253,6 +253,7 @@
                                 <td><span class="badge bg-label-secondary">{{ $apartment->complex->name }}</span></td>
                                 <td>{{ $apartment->status->label() }}</td>
                                 <td>{{ $apartment->price === null ? '' : number_format($apartment->price, 0, '', ' ').' €' }}</td>
+                                <td>@if(in_array($apartment->id, $shown))<span class="badge bg-label-success">показан</span>@else<span class="badge bg-label-secondary">не помещается</span>@endif</td>
                                 <td><a href="{{ route('admin.apartments.edit', $apartment) }}"><i class="bx bx-edit-alt me-1"></i>Изменить</a></td>
                             </tr>
                         @endforeach

@@ -27,6 +27,8 @@ class HomePageController extends Controller
             'scenarios' => $rows->where('kind', HomeRow::KIND_SCENARIO)->values(),
             'directions' => $rows->where('kind', HomeRow::KIND_DIRECTION)->values(),
             'objects' => Apartment::query()->with('complex')->onHome()->ordered()->get(),
+            'shown' => Apartment::homeObjects()->pluck('id')->all(),
+            'homeLimit' => Apartment::HOME_LIMIT,
             'linkGroups' => SitePages::groups(),
         ]);
     }
