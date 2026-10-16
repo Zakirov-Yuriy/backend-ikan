@@ -29,14 +29,17 @@ class LeadController extends Controller
             'page' => ['nullable', 'string', 'max:255'],
             'consent_terms' => ['accepted'],
             'consent_privacy' => ['accepted'],
+            /* Реклама по желанию: без галочки заявка тоже принимается (16.10) */
+            'consent_ads' => ['sometimes', 'boolean'],
         ], [
             'phone.regex' => 'В телефоне могут быть только цифры, пробелы, скобки, плюс и дефис.',
         ], [
             'name' => '«имя»',
             'phone' => '«телефон»',
             'interest' => '«что вас интересует»',
-            'consent_terms' => '«согласие с условиями»',
-            'consent_privacy' => '«согласие с политикой»',
+            'consent_terms' => '«согласие с соглашением и политикой»',
+            'consent_privacy' => '«согласие на обработку персональных данных»',
+            'consent_ads' => '«согласие на рекламу»',
         ]);
 
         $lead = Lead::create([
@@ -46,6 +49,7 @@ class LeadController extends Controller
             'interest' => isset($data['interest']) ? trim($data['interest']) ?: null : null,
             'consent_terms' => true,
             'consent_privacy' => true,
+            'consent_ads' => (bool) ($data['consent_ads'] ?? false),
             'ip' => $request->ip(),
             'user_agent' => mb_substr((string) $request->userAgent(), 0, 500),
             'status' => Lead::STATUS_NEW,

@@ -28,6 +28,7 @@
                             <th>Имя и телефон</th>
                             <th>Что интересует</th>
                             <th>Откуда</th>
+                            <th>Реклама</th>
                             <th>Статус</th>
                             <th>Действия</th>
                         </tr>
@@ -39,6 +40,7 @@
                                 <td class="text-nowrap">{{ $lead->name }}<br><a href="tel:{{ preg_replace('/[^\d+]/', '', $lead->phone) }}">{{ $lead->phone }}</a></td>
                                 <td style="max-width: 320px; white-space: normal">{{ $lead->interest ?: '' }}</td>
                                 <td style="white-space: normal"><small>{{ $lead->sourceLabel() }}@if($lead->page)<br><a href="{{ config('app.site_url') }}{{ $lead->page }}" target="_blank" rel="noopener" class="text-muted">{{ $lead->page }}</a>@endif</small></td>
+                                <td>@if($lead->consent_ads)<span class="badge bg-label-info" title="Согласие на рекламные и информационные сообщения">согласен</span>@else<small class="text-muted">нет</small>@endif</td>
                                 <td><span class="badge {{ $lead->isNew() ? 'bg-label-danger' : 'bg-label-success' }}">{{ $lead->isNew() ? 'Новая' : 'Обработана' }}</span></td>
                                 <td class="text-nowrap">
                                     <form action="{{ route('admin.leads.toggle', $lead) }}" method="POST" class="d-inline">

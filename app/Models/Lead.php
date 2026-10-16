@@ -18,7 +18,7 @@ class Lead extends Model
 
     protected $fillable = [
         'name', 'phone', 'interest', 'source', 'page',
-        'consent_terms', 'consent_privacy', 'ip', 'user_agent', 'status',
+        'consent_terms', 'consent_privacy', 'consent_ads', 'ip', 'user_agent', 'status',
     ];
 
     protected function casts(): array
@@ -26,6 +26,7 @@ class Lead extends Model
         return [
             'consent_terms' => 'boolean',
             'consent_privacy' => 'boolean',
+            'consent_ads' => 'boolean',
         ];
     }
 

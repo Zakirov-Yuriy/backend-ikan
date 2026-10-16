@@ -64,6 +64,7 @@ class LeadNotifier
             $lines[] = 'Что интересует: '.e($lead->interest);
         }
         $lines[] = $lead->sourceLabel().($lead->page ? ', страница '.e($lead->page) : '');
+        $lines[] = $lead->consent_ads ? 'Реклама: согласен' : 'Реклама: без согласия';
         try {
             $response = Http::timeout(10)->post("https://api.telegram.org/bot{$token}/sendMessage", [
                 'chat_id' => $chatId,

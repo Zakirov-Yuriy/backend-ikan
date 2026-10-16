@@ -81,6 +81,28 @@ class LeadsTest extends TestCase
         $this->assertDatabaseCount('leads', 1);
     }
 
+    /* Три галочки (16.10): соглашение и политика, персональные данные обязательны, реклама по желанию */
+    public function test_consents_and_ads(): void
+    {
+        Mail::fake();
+        Setting::set(Setting::NOTIFY_EMAILS, 'a@example.com');
+        $this->postJson('/api/requests', $this->payload)->assertCreated();
+        $this->assertFalse(Lead::query()->latest('id')->first()->consent_ads);
+
+        $this->postJson('/api/requests', [...$this->payload, 'name' => 'Реклама', 'consent_ads' => true])->assertCreated();
+        $this->assertTrue(Lead::query()->where('name', 'Реклама')->first()->consent_ads);
+
+        $without = $this->payload;
+        unset($without['consent_privacy']);
+        $this->postJson('/api/requests', $without)->assertStatus(422)->assertJsonValidationErrors('consent_privacy');
+        $this->postJson('/api/requests', [...$this->payload, 'consent_terms' => false])->assertStatus(422)->assertJsonValidationErrors('consent_terms');
+        $this->postJson('/api/requests', [...$this->payload, 'consent_ads' => 'abc'])->assertStatus(422)->assertJsonValidationErrors('consent_ads');
+
+        $this->actingAs(User::factory()->create());
+        $this->get('/admin/leads')->assertOk()->assertSee('Реклама')->assertSee('согласен');
+        Mail::assertSent(LeadMail::class, fn ($mail) => str_contains($mail->render(), 'согласен на рекламные'));
+    }
+
     public function test_admin_list_toggle_delete_and_settings(): void
     {
         Mail::fake();

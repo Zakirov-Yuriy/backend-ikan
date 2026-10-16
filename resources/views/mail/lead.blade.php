@@ -13,6 +13,7 @@
         <tr><td style="color: #667781; vertical-align: top;">Что интересует</td><td>{{ $lead->interest }}</td></tr>
     @endif
     <tr><td style="color: #667781;">Откуда</td><td>{{ $lead->sourceLabel() }}@if($lead->page), страница {{ $lead->page }}@endif</td></tr>
+    <tr><td style="color: #667781;">Реклама</td><td>{{ $lead->consent_ads ? 'согласен на рекламные и информационные сообщения' : 'без согласия на рекламу' }}</td></tr>
     <tr><td style="color: #667781;">Когда</td><td>{{ $lead->created_at?->format('d.m.Y H:i') }}</td></tr>
 </table>
 <p style="margin-top: 16px;"><a href="{{ route('admin.leads.index') }}">Открыть заявки в админке</a></p>
