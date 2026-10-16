@@ -77,7 +77,7 @@ php artisan serve
 | `GET /api/apartments` | карточки апартаментов; отбор `?catalog=living|renting|newbuilds`, `?status=building|ready`, `?complex=l1` |
 | `GET /api/apartments/{slug}` | страница апартамента |
 | `GET /api/restaurant` | страница ресторана |
-| `POST /api/requests` | приём заявки; `consent_terms` и `consent_privacy` должны быть `true`, `consent_ads` необязательное; не больше 20 в минуту с одного адреса |
+| `POST /api/requests` | приём заявки; телефон: число цифр как в номерах страны (`giggsey/libphonenumber-for-php-lite`, `isPossibleNumber`, без кода страны номер российский); `consent_terms` и `consent_privacy` должны быть `true`, `consent_ads` необязательное; не больше 20 в минуту с одного адреса |
 
 «Актуальные объекты» (`Apartment::homeObjects()`): первые три апартамента с галочкой «На главной» в порядке списка; если галочки нет ни у одного, первые три из списка.
 

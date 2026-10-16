@@ -81,6 +81,19 @@ class LeadsTest extends TestCase
         $this->assertDatabaseCount('leads', 1);
     }
 
+    /* Число цифр в номере по стране (16.10): Россия, СНГ, Сербия; слишком короткий и бесконечный нет */
+    public function test_phone_length_by_country(): void
+    {
+        Mail::fake();
+        foreach (['+7 999 123-45-67', '8 999 123 45 67', '9991234567', '+381 64 123 45 67', '+381 11 123 4567', '+375 29 123 45 67', '+998 90 123 45 67', '+7 701 123 45 67'] as $i => $phone) {
+            $this->postJson('/api/requests', [...$this->payload, 'name' => "Номер {$i}", 'phone' => $phone])->assertCreated();
+        }
+        foreach (['+7 999 123', '+7 999 123 45 678', '+381 6', '12345', str_repeat('9', 40)] as $phone) {
+            $this->postJson('/api/requests', [...$this->payload, 'phone' => $phone])->assertStatus(422)
+                ->assertJsonValidationErrors(['phone' => 'Проверьте номер телефона']);
+        }
+    }
+
     /* Три галочки (16.10): соглашение и политика, персональные данные обязательны, реклама по желанию */
     public function test_consents_and_ads(): void
     {
