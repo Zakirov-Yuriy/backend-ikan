@@ -18,8 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
          * Заявки приходят через сервер сайта, он передаёт адрес посетителя в
          * X-Forwarded-For. Доверяем этому заголовку, иначе все посетители
          * считались бы одним адресом (сайта) и упирались бы в общий лимит.
+         * X-Forwarded-Proto: на хостинге (Render) https заканчивается на его
+         * прокси, без этого заголовка ссылки и стили админки были бы http.
          */
-        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR);
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_PROTO);
 
         /* Без входа любая страница админки ведёт на форму входа */
         $middleware->redirectGuestsTo('/admin/login');
