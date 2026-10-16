@@ -86,7 +86,7 @@ class SiteApiTest extends TestCase
     public function test_home(): void
     {
         $response = $this->getJson('/api/home')->assertOk();
-        $response->assertJsonPath('data.hero.title', 'Пространство для жизни.');
+        $response->assertJsonPath('data.hero.title', 'Пространство для жизни и инвестиций.');
         $response->assertJsonPath('data.hero.primary_label', 'Смотреть объекты');
         $response->assertJsonCount(3, 'data.hero.side_items');
         $response->assertJsonCount(5, 'data.scenarios');
@@ -135,6 +135,11 @@ class SiteApiTest extends TestCase
         HomePage::query()->update(['objects_all_href' => '#', 'hero_title' => 'Своё']);
         $this->seed(SiteContentSeeder::class);
         $this->getJson('/api/home')->assertJsonPath('data.objects.all.href', '/dlya-sebya')->assertJsonPath('data.hero.title', 'Своё');
+
+        /* Старый заголовок по умолчанию заменяется, свой из админки остаётся */
+        HomePage::query()->update(['hero_title' => 'Пространство для жизни.']);
+        $this->seed(SiteContentSeeder::class);
+        $this->getJson('/api/home')->assertJsonPath('data.hero.title', 'Пространство для жизни и инвестиций.');
 
         /* Телефон по умолчанию, пока в настройках не задан */
         $this->getJson('/api/site')->assertOk()->assertJsonPath('data.phone.href', 'tel:+79912552900');

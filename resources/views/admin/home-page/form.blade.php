@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label for="hero_title" class="form-label">Заголовок, первая строка*</label>
-                                    <input type="text" class="form-control" name="hero_title" id="hero_title" placeholder="Пространство для жизни." required maxlength="255" value="{{ $v('hero_title') }}"/>
+                                    <input type="text" class="form-control" name="hero_title" id="hero_title" placeholder="Пространство для жизни и инвестиций." required maxlength="255" value="{{ $v('hero_title') }}"/>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="hero_title_accent" class="form-label">Заголовок, вторая строка (голубая)</label>

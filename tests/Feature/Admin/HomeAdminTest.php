@@ -42,7 +42,7 @@ class HomeAdminTest extends TestCase
     {
         $this->get('/admin/home-page')
             ->assertOk()
-            ->assertSee('Пространство для жизни.')
+            ->assertSee('Пространство для жизни и инвестиций.')
             ->assertSee('Локальная экспертиза')
             ->assertSee('Высокий туристический спрос')
             ->assertSee('Покупка жилья для себя')
@@ -108,7 +108,7 @@ class HomeAdminTest extends TestCase
             'hero_secondary_label' => 'y',
             'objects_all_href' => 'dlya-sebya',
         ])->assertRedirect('/admin/home-page')->assertSessionHasErrors(['hero_title', 'objects_all_href']);
-        $this->assertSame('Пространство для жизни.', HomePage::current()->hero_title);
+        $this->assertSame('Пространство для жизни и инвестиций.', HomePage::current()->hero_title);
     }
 
     public function test_scenario_row_is_added_edited_sorted_and_deleted(): void
