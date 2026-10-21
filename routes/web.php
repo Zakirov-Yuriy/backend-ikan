@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\StatsController;
 use Illuminate\Support\Facades\Route;
 
 /* Корень бэкенда ведёт в админку */
@@ -23,6 +24,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('auth')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('stats', [StatsController::class, 'index'])->name('stats');
 
         Route::post('complexes/sort', [ComplexController::class, 'sort'])->name('complexes.sort');
         Route::resource('complexes', ComplexController::class)->except('show');

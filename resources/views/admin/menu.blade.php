@@ -22,6 +22,13 @@
             </a>
         </li>
 
+        <li class="menu-item{{ Menu::active('admin.stats') ? ' active' : '' }}">
+            <a href="{{ route('admin.stats') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-line-chart"></i>
+                <div>Статистика</div>
+            </a>
+        </li>
+
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Объекты</span></li>
 
         <li class="menu-item{{ Menu::active('admin.complexes') ? ' active' : '' }}">
