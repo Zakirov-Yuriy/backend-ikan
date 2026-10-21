@@ -33,6 +33,16 @@ return [
         'token' => env('TELEGRAM_BOT_TOKEN'),
     ],
 
+    /*
+     * Битрикс24: запасные значения, если в «Настройках» админки пусто.
+     * Удобно на хостинге, где база сбрасывается (бесплатный Render).
+     */
+    'bitrix24' => [
+        'webhook' => env('BITRIX24_WEBHOOK'),
+        'entity' => env('BITRIX24_ENTITY', 'lead'),
+        'assigned' => env('BITRIX24_ASSIGNED'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

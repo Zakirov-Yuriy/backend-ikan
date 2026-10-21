@@ -11,18 +11,21 @@ use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /*
- * Уведомления о новой заявке: письмо на адреса из настроек и сообщение в
- * Telegram в чат из настроек. Ошибки не мешают сохранению заявки, они
+ * Уведомления о новой заявке: письмо на адреса из настроек, сообщение в
+ * Telegram в чат из настроек и запись в Битрикс24 заказчика (21.10). Ошибки не мешают сохранению заявки, они
  * пишутся в лог и возвращаются как текст (для кнопки проверки в админке).
  */
 class LeadNotifier
 {
-    /** @return array{email: string, telegram: string} что получилось, человеческим языком */
+    public function __construct(private readonly Bitrix24 $bitrix) {}
+
+    /** @return array{email: string, telegram: string, bitrix: string} что получилось, человеческим языком */
     public function notify(Lead $lead, bool $test = false): array
     {
         return [
             'email' => $this->sendEmail($lead, $test),
             'telegram' => $this->sendTelegram($lead, $test),
+            'bitrix' => $this->bitrix->send($lead, $test),
         ];
     }
 

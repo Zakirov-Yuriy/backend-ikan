@@ -11,6 +11,21 @@ class Setting extends Model
 
     public const TELEGRAM_CHAT_ID = 'telegram_chat_id';
 
+    /* Битрикс24 (21.10): ссылка входящего вебхука, что создавать, ответственный, воронка и этап сделки */
+    public const BITRIX_WEBHOOK = 'bitrix_webhook';
+
+    public const BITRIX_ENTITY = 'bitrix_entity';
+
+    public const BITRIX_ASSIGNED = 'bitrix_assigned';
+
+    public const BITRIX_CATEGORY = 'bitrix_category';
+
+    public const BITRIX_STAGE = 'bitrix_stage';
+
+    public const BITRIX_LEAD = 'lead';
+
+    public const BITRIX_DEAL = 'deal';
+
     /* Телефон на сайте: шапка, подвал, кнопки «Позвонить», тексты форм */
     public const PHONE = 'phone';
 
@@ -82,6 +97,30 @@ class Setting extends Model
     public static function phoneHref(?string $phone = null): string
     {
         return 'tel:'.preg_replace('/[^\d+]/', '', $phone ?? static::phone());
+    }
+
+    /* Что создавать в Битрикс24: лид (по умолчанию) или сделку с контактом */
+    public static function bitrixEntity(): string
+    {
+        $value = (string) static::get(self::BITRIX_ENTITY, (string) config('services.bitrix24.entity', self::BITRIX_LEAD));
+
+        return $value === self::BITRIX_DEAL ? self::BITRIX_DEAL : self::BITRIX_LEAD;
+    }
+
+    /* Номер ответственного сотрудника в Битрикс24, null: тот, кто создал вебхук */
+    public static function bitrixAssigned(): ?int
+    {
+        $value = (int) static::get(self::BITRIX_ASSIGNED, (string) config('services.bitrix24.assigned', ''));
+
+        return $value > 0 ? $value : null;
+    }
+
+    /* Номер воронки сделок, null: общая воронка (номер 0) */
+    public static function bitrixCategory(): ?int
+    {
+        $value = trim((string) static::get(self::BITRIX_CATEGORY, ''));
+
+        return $value === '' ? null : (int) $value;
     }
 
     /** @return string[] адреса для уведомлений о заявках */

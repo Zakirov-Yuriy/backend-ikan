@@ -62,11 +62,52 @@
                                     </div>
                                 @endif
                             </div>
+                            <div class="divider text-start"><div class="divider-text">Битрикс24: заявки в CRM</div></div>
+                            <div class="mb-3">
+                                <label for="bitrix_webhook" class="form-label">Ссылка входящего вебхука</label>
+                                <input type="url" class="form-control" name="bitrix_webhook" id="bitrix_webhook" maxlength="500" placeholder="https://ваш-портал.bitrix24.ru/rest/1/abc123def456/" value="{{ old('bitrix_webhook', $bitrixWebhook) }}" autocomplete="off"/>
+                                <div class="form-text">
+                                    Каждая заявка с сайта будет создаваться в Битрикс24. Ссылку создаёт администратор Битрикс24: «Разработчикам», «Другое», «Входящий вебхук», в правах отметить «CRM», скопировать адрес вебхука сюда. Это секрет, как пароль: не пересылайте его в переписке. Если поле пустое, заявки в Битрикс24 не уходят.
+                                    @if($bitrixFromEnv)
+                                        <span class="d-block mt-1">Сейчас ссылка взята из настроек сервера (BITRIX24_WEBHOOK), поэтому поле пустое.</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <span class="form-label d-block">Что создавать</span>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="bitrix_entity" id="bitrix_lead" value="lead" @checked(old('bitrix_entity', $bitrixEntity) === 'lead')>
+                                    <label class="form-check-label" for="bitrix_lead">Лид</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="bitrix_entity" id="bitrix_deal" value="deal" @checked(old('bitrix_entity', $bitrixEntity) === 'deal')>
+                                    <label class="form-check-label" for="bitrix_deal">Сделка и контакт</label>
+                                </div>
+                                <div class="form-text">Лид, если в Битрикс24 классический режим CRM. Сделка и контакт, если простой режим, без лидов. Режим покажет кнопка «Проверить Битрикс24» ниже.</div>
+                            </div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="bitrix_assigned" class="form-label">Ответственный, номер</label>
+                                    <input type="number" class="form-control" name="bitrix_assigned" id="bitrix_assigned" min="1" placeholder="1" value="{{ old('bitrix_assigned', $bitrixAssigned) }}"/>
+                                    <div class="form-text">Номер сотрудника в Битрикс24 (виден в адресе его профиля). Пусто: тот, кто создал вебхук.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="bitrix_category" class="form-label">Воронка сделок, номер</label>
+                                    <input type="number" class="form-control" name="bitrix_category" id="bitrix_category" min="0" placeholder="0" value="{{ old('bitrix_category', $bitrixCategory) }}"/>
+                                    <div class="form-text">Только для сделок. Пусто: общая воронка.</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="bitrix_stage" class="form-label">Этап сделки, код</label>
+                                    <input type="text" class="form-control" name="bitrix_stage" id="bitrix_stage" maxlength="50" placeholder="NEW" value="{{ old('bitrix_stage', $bitrixStage) }}"/>
+                                    <div class="form-text">Только для сделок. Пусто: первый этап воронки.</div>
+                                </div>
+                            </div>
                             <button type="submit" class="btn btn-dark">Сохранить</button>
                         </div>
                     </form>
                     <div class="card-body border-top d-flex flex-wrap gap-2">
                         <form action="{{ route('admin.settings.chats') }}" method="POST">@csrf<button type="submit" class="btn btn-outline-secondary">Найти chat id</button></form>
+                        <form action="{{ route('admin.settings.bitrix') }}" method="POST">@csrf<button type="submit" class="btn btn-outline-secondary">Проверить Битрикс24</button></form>
                         <form action="{{ route('admin.settings.test') }}" method="POST">@csrf<button type="submit" class="btn btn-outline-primary">Отправить проверочное уведомление</button></form>
                     </div>
                 </div>

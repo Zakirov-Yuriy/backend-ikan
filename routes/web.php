@@ -49,5 +49,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::post('settings/test', [SettingsController::class, 'test'])->name('settings.test');
         Route::post('settings/telegram-chats', [SettingsController::class, 'chats'])->name('settings.chats');
+        Route::post('settings/bitrix-check', [SettingsController::class, 'bitrixCheck'])->name('settings.bitrix');
     });
 });
