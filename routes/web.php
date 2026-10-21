@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\HomePageController;
 use App\Http\Controllers\Admin\HomeRowController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -50,5 +51,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('settings/test', [SettingsController::class, 'test'])->name('settings.test');
         Route::post('settings/telegram-chats', [SettingsController::class, 'chats'])->name('settings.chats');
         Route::post('settings/bitrix-check', [SettingsController::class, 'bitrixCheck'])->name('settings.bitrix');
+
+        Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
+        Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     });
 });

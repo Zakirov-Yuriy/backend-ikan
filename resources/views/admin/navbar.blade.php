@@ -29,6 +29,19 @@
                     </li>
                     <li><div class="dropdown-divider"></div></li>
                     <li>
+                        <a class="dropdown-item" href="{{ route('admin.profile.show') }}">
+                            <i class="bx bx-user me-2"></i>
+                            <span class="align-middle">Мой профиль</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('admin.profile.edit') }}">
+                            <i class="bx bx-cog me-2"></i>
+                            <span class="align-middle">Настройки профиля</span>
+                        </a>
+                    </li>
+                    <li><div class="dropdown-divider"></div></li>
+                    <li>
                         <form action="{{ route('admin.logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="dropdown-item">
