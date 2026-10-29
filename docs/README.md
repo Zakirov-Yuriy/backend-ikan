@@ -125,7 +125,125 @@ php artisan serve
 
 Render, сервис из `Dockerfile` (PHP 8.4, Composer, `composer install --no-dev`). При запуске `docker/start.sh`: адрес, ключ, создание базы, `migrate --force`, `db:seed --force`, тестовые апартаменты, пользователь админки, `php artisan serve`. Health Check `/up`. Каждая отправка в `main` пересобирает сервис.
 
-Важно: у бесплатного Render нет постоянного диска. База и фото стираются при каждой сборке, перезапуске и засыпании (через 15 минут без посещений). Поэтому на показе пропадают заявки, правки и фото из админки и слетает вход, а при запуске всё наполняется заново из seed. Для постоянной работы нужен хостинг с сохраняемым диском или отдельная база (решается отдельно). Прокси Render: в `bootstrap/app.php` доверие заголовкам `X-Forwarded-For` и `X-Forwarded-Proto`, иначе ссылки админки были бы http.
+Важно: у бесплатного Render нет постоянного диска. База и фото стираются при каждой сборке, перезапуске и засыпании (через 15 минут без посещений). Поэтому на показе пропадают заявки, правки и фото из админки и слетает вход, а при запуске всё наполняется заново из seed. Для постоянной работы свой сервер, ниже. Прокси Render: в `bootstrap/app.php` доверие заголовкам `X-Forwarded-For` и `X-Forwarded-Proto`, иначе ссылки админки были бы http.
+
+## Свой сервер (ik-ikan.ru)
+
+Бэкенд и сайт (`ikan`, Next.js) на одном сервере: nginx, php-fpm 8.4, PostgreSQL. Снаружи виден только nginx с https. Бэкенд снаружи открыт по трём адресам на домене сайта, остальное закрыто:
+
+| Адрес | Что | Снаружи |
+|---|---|---|
+| `ik-ikan.ru/admin` | админка, вход по почте и паролю | да, нужна заказчику |
+| `ik-ikan.ru/admin_front/` | стили и скрипты админки (`public/admin_front`) | да, без них админка без оформления |
+| `ik-ikan.ru/media/` | фото (`public/media`) | да |
+| `/api/...` | API для сайта | нет: сайт ходит в него с этого же сервера по `127.0.0.1:8080` |
+| всё остальное на `ik-ikan.ru` | сайт, Next.js на `127.0.0.1:3000` | да |
+
+Сам сайт фото с бэкенда не требует: он отдаёт их со своего адреса `/media/...` и забирает у бэкенда по внутреннему адресу (`rewrites` в `next.config.ts` сайта), поэтому `APP_URL` на адреса фото на сайте не влияет.
+
+### Установка бэкенда
+
+Папка, например, `/var/www/back`. Пакет `laravel/boost` на сервере не нужен (это подсказки для редактора кода), на вопросы `boost:install` отвечать не надо: `composer install --no-dev` его не ставит.
+
+```
+cd /var/www/back
+composer install --no-dev --optimize-autoloader --no-interaction
+cp .env.example .env         # и поправить, см. ниже
+php artisan key:generate     # APP_KEY; без него «No application encryption key has been specified»
+php artisan migrate --force
+php artisan db:seed --force  # тексты главной и списков, ЖК, объекты и фото со старого сайта; повторный запуск безопасен
+php artisan admin:user почта@заказчика --password=пароль
+php artisan config:cache && php artisan route:cache && php artisan view:cache
+chown -R www-data:www-data storage bootstrap/cache public/media
+```
+
+После каждого нового архива: `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, `php artisan config:cache && php artisan route:cache && php artisan view:cache`.
+
+`.env` на сервере (остальное как в `.env.example`):
+
+```
+APP_NAME=ИКАН
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://ik-ikan.ru
+SITE_URL=https://ik-ikan.ru
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=ikan
+DB_USERNAME=ikan
+DB_PASSWORD=...
+
+SESSION_SECURE_COOKIE=true
+```
+
+`APP_DEBUG=false` обязательно: с `true` страница ошибки показывает код и настройки всем посетителям. Для PostgreSQL нужно расширение `php8.4-pgsql`, для фото `php8.4-gd`; проверка: `composer check-platform-reqs`.
+
+### nginx
+
+```nginx
+# Бэкенд для сайта: только с этого сервера. API, сюда ходит Next.js (BACKEND_URL=http://127.0.0.1:8080)
+server {
+    listen 127.0.0.1:8080;
+    root /var/www/back/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    }
+}
+
+# Сайт и админка, снаружи
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ik-ikan.ru www.ik-ikan.ru;
+    # ssl_certificate и ssl_certificate_key от certbot
+
+    # Фото в админке грузятся пачками, PHP принимает до 8 МБ за раз (post_max_size)
+    client_max_body_size 10m;
+
+    # Админка, её стили и скрипты, фото: в бэкенд
+    location ~ ^/(admin|admin_front|media)(/|$) {
+        root /var/www/back/public;
+        try_files $uri /index.php?$query_string;
+    }
+    location = /index.php {
+        root /var/www/back/public;
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param HTTPS on;
+    }
+
+    # Всё остальное: сайт
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+
+server {
+    listen 80;
+    server_name ik-ikan.ru www.ik-ikan.ru;
+    return 301 https://$host$request_uri;
+}
+```
+
+Как это работает: адреса `/admin...`, `/admin_front/...`, `/media/...` nginx ищет как файлы в `public` бэкенда (стили, фото), а чего нет, передаёт в `public/index.php`, то есть в Laravel с исходным адресом запроса. Остальное уходит в Next.js. Если админку хочется закрыть дополнительно, на `location ~ ^/(admin|admin_front|media)(/|$)` можно повесить `allow`/`deny` по адресам или `auth_basic`.
+
+Сайт на сервере: `BACKEND_URL=http://127.0.0.1:8080` и `SITE_URL=https://ik-ikan.ru` в `.env.local`, `npm ci`, `npm run build`, `npm run start` (слушает только `127.0.0.1:3000`). Подробнее в вики сайта, раздел «Свой сервер».
 
 ## Правила в коде
 
