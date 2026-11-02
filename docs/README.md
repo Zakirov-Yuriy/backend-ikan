@@ -1,5 +1,7 @@
 # Бэкенд ИКАН: документация
 
+Инструкция для заказчика по работе в админке: `docs/ADMIN.md`.
+
 Один проект Laravel на два дела: API для сайта (адреса `/api/...`) и админка для наполнения сайта (адреса `/admin/...`). Сайт (`ikan`, Next.js) берёт отсюда объекты, тексты, фото, телефоны и отправляет сюда заявки. Вики сайта в его репозитории, `docs/WIKI.md`.
 
 - Репозиторий: https://github.com/Zakirov-Yuriy/backend-ikan
@@ -203,8 +205,8 @@ server {
 server {
     listen 443 ssl;
     http2 on;
-    server_name ik-ikan.ru www.ik-ikan.ru;
-    # ssl_certificate и ssl_certificate_key от certbot
+    server_name ik-ikan.ru;
+    # ssl_certificate и ssl_certificate_key от certbot (сертификат на оба имени, с www и без)
 
     # Фото в админке грузятся пачками, PHP принимает до 8 МБ за раз (post_max_size)
     client_max_body_size 10m;
@@ -234,14 +236,23 @@ server {
     }
 }
 
+# www и http: на основной адрес, чтобы у сайта был один адрес, а не две копии
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name www.ik-ikan.ru;
+    # те же ssl_certificate и ssl_certificate_key
+    return 301 https://ik-ikan.ru$request_uri;
+}
+
 server {
     listen 80;
     server_name ik-ikan.ru www.ik-ikan.ru;
-    return 301 https://$host$request_uri;
+    return 301 https://ik-ikan.ru$request_uri;
 }
 ```
 
-Как это работает: адреса `/admin...`, `/admin_front/...`, `/media/...` nginx ищет как файлы в `public` бэкенда (стили, фото), а чего нет, передаёт в `public/index.php`, то есть в Laravel с исходным адресом запроса. Остальное уходит в Next.js. Если админку хочется закрыть дополнительно, на `location ~ ^/(admin|admin_front|media)(/|$)` можно повесить `allow`/`deny` по адресам или `auth_basic`.
+Как это работает: адреса `/admin...`, `/admin_front/...`, `/media/...` nginx ищет как файлы в `public` бэкенда (стили, фото), а чего нет, передаёт в `public/index.php`, то есть в Laravel с исходным адресом запроса. Остальное уходит в Next.js. Без `/admin_front/` админка открывается без оформления: её стили и скрипты лежат в `public/admin_front`. Проверка: `curl -I https://ik-ikan.ru/admin_front/assets/vendor/css/core.css` должен дать `200` и `text/css`. Без `client_max_body_size` nginx обрежет загрузку фото в админке на 1 МБ (ошибка 413). Если админку хочется закрыть дополнительно, на `location ~ ^/(admin|admin_front|media)(/|$)` можно повесить `allow`/`deny` по адресам или `auth_basic`.
 
 Сайт на сервере: `BACKEND_URL=http://127.0.0.1:8000` и `SITE_URL=https://ik-ikan.ru` в `.env.local`, `npm ci`, `npm run build`, `npm run start` (слушает только `127.0.0.1:3000`). Подробнее в вики сайта, раздел «Свой сервер».
 
