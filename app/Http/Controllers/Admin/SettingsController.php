@@ -22,6 +22,8 @@ class SettingsController extends Controller
             'phone' => Setting::get(Setting::PHONE, Setting::DEFAULT_PHONE),
             'phone2' => Setting::phone2(),
             'socials' => collect(Setting::SOCIALS)->map(fn ($item, $name) => $item + ['value' => Setting::socials()[$name]]),
+            'metrikaId' => Setting::get(Setting::METRIKA_ID, ''),
+            'metrikaWebvisor' => Setting::get(Setting::METRIKA_WEBVISOR, '') === '1',
             'notifyEmails' => Setting::get(Setting::NOTIFY_EMAILS, ''),
             'telegramChatId' => Setting::get(Setting::TELEGRAM_CHAT_ID, ''),
             'telegramToken' => (string) config('services.telegram.token') !== '',
@@ -44,6 +46,8 @@ class SettingsController extends Controller
             'social_max' => ['nullable', 'string', 'max:300', 'url:http,https'],
             'social_telegram' => ['nullable', 'string', 'max:300', 'url:http,https'],
             'social_vk' => ['nullable', 'string', 'max:300', 'url:http,https'],
+            'metrika_id' => ['nullable', 'string', 'max:20', 'regex:/^\d+$/'],
+            'metrika_webvisor' => ['nullable', 'boolean'],
             'notify_emails' => ['nullable', 'string', 'max:500'],
             'telegram_chat_id' => ['nullable', 'string', 'max:50', 'regex:/^-?\d+$/'],
             'bitrix_webhook' => ['nullable', 'string', 'max:500', 'url:https', 'regex:#/rest/\d+/[^/]+/?$#'],
@@ -55,6 +59,7 @@ class SettingsController extends Controller
             'phone.regex' => 'Телефон: цифры, пробелы, скобки, дефис и плюс в начале, например +7 (991) 255-29-00.',
             'phone_2.regex' => 'Второй телефон: цифры, пробелы, скобки, дефис и плюс в начале, например +7 (991) 587-24-57.',
             'url' => 'Ссылка :attribute должна начинаться с https:// или http://.',
+            'metrika_id.regex' => 'Номер счётчика Метрики это число, например 12345678. Он виден в кабинете Метрики рядом с названием счётчика.',
             'telegram_chat_id.regex' => 'Chat id в Telegram это число, например 123456789 или -1001234567890. Нажмите «Найти chat id» ниже.',
             'bitrix_webhook.url' => 'Ссылка вебхука Битрикс24 должна начинаться с https://.',
             'bitrix_webhook.regex' => 'Это не похоже на ссылку входящего вебхука. Она выглядит так: https://ваш-портал.bitrix24.ru/rest/1/abc123def456/',
@@ -65,6 +70,7 @@ class SettingsController extends Controller
             'social_max' => '«MAX»',
             'social_telegram' => '«Telegram»',
             'social_vk' => '«ВКонтакте»',
+            'metrika_id' => '«номер счётчика Метрики»',
             'notify_emails' => '«почта для уведомлений»',
             'telegram_chat_id' => '«chat id в Telegram»',
             'bitrix_webhook' => '«ссылка вебхука Битрикс24»',
@@ -91,6 +97,8 @@ class SettingsController extends Controller
         foreach (Setting::SOCIALS as $item) {
             Setting::set($item['key'], trim((string) ($data[$item['key']] ?? '')));
         }
+        Setting::set(Setting::METRIKA_ID, trim((string) ($data['metrika_id'] ?? '')));
+        Setting::set(Setting::METRIKA_WEBVISOR, $request->boolean('metrika_webvisor') ? '1' : '');
         Setting::set(Setting::NOTIFY_EMAILS, trim($raw));
         Setting::set(Setting::TELEGRAM_CHAT_ID, trim((string) ($data['telegram_chat_id'] ?? '')));
         Setting::set(Setting::BITRIX_WEBHOOK, trim((string) ($data['bitrix_webhook'] ?? '')));

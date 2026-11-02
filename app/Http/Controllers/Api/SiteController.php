@@ -11,7 +11,8 @@ class SiteController extends Controller
     /*
      * Общие данные сайта из настроек. phone: главный телефон (кнопки
      * «Позвонить»), phones: все телефоны для текста, socials: ссылки иконок
-     * подвала, null если иконку не показывать.
+     * подвала, null если иконку не показывать. metrika: счётчик Яндекс
+     * Метрики (02.11), id null, если счётчик не задан в «Настройках».
      */
     public function show(): JsonResponse
     {
@@ -22,6 +23,10 @@ class SiteController extends Controller
             'phone' => ['label' => $phone, 'href' => Setting::phoneHref($phone)],
             'phones' => array_map(fn ($item) => ['label' => $item, 'href' => Setting::phoneHref($item)], Setting::phones()),
             'socials' => $socials,
+            'metrika' => [
+                'id' => ($id = trim((string) Setting::get(Setting::METRIKA_ID, ''))) !== '' ? (int) $id : null,
+                'webvisor' => Setting::get(Setting::METRIKA_WEBVISOR, '') === '1',
+            ],
         ]]);
     }
 }

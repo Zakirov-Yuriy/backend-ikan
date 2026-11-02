@@ -125,6 +125,25 @@ class StatsTest extends TestCase
         $this->get('/admin/stats?period=7')->assertOk();
     }
 
+    /* Сегодняшние просмотры видны в «Сегодня» и последней точке «7 дней» (баг с границей дня, 02.11) */
+    public function test_today_is_included_in_periods(): void
+    {
+        $this->track(['path' => '/', 'referrer' => '']);
+        $this->track(['path' => '/restoran', 'referrer' => ''], self::DESK, '10.0.0.2');
+        $this->actingAs(User::factory()->create());
+
+        $today = $this->get('/admin/stats?period=today')->assertOk();
+        $this->assertSame(2, $today->viewData('totals')['visitors']);
+        $this->assertSame(2, $today->viewData('totals')['views']);
+
+        $week = $this->get('/admin/stats?period=7')->assertOk();
+        $daily = $week->viewData('daily');
+        $this->assertCount(7, $daily['days']);
+        $this->assertSame(now('Europe/Moscow')->toDateString(), end($daily['days']));
+        $this->assertSame(2, end($daily['views']));
+        $this->assertSame(2, $week->viewData('totals')['views']);
+    }
+
     public function test_source_labels(): void
     {
         $this->assertSame('Яндекс', PageView::sourceLabel('yandex.ru'));

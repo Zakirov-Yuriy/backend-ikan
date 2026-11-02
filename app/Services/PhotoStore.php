@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\PhotoStoreException;
 use App\Models\Apartment;
 use App\Models\HomePage;
 use App\Models\HomeRow;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Flysystem\FilesystemException;
 
 /*
  * Загрузка и удаление фотографий объекта на диске media.
@@ -70,7 +72,20 @@ class PhotoStore
             $extension = 'jpg';
         }
         $name = $role.'-'.Str::lower(Str::random(6)).'.'.$extension;
-        $path = Storage::disk('media')->putFileAs($this->folder($owner), $file, $name);
+        $folder = $this->folder($owner);
+        try {
+            $path = Storage::disk('media')->putFileAs($folder, $file, $name);
+        } catch (FilesystemException) {
+            /* Папку нельзя создать: та же причина, нет прав */
+            $path = false;
+        }
+        if ($path === false || ! Storage::disk('media')->exists($path)) {
+            /* Обычно нет прав на запись: папка public/media принадлежит не тому пользователю, от которого работает PHP */
+            throw new PhotoStoreException(
+                "Фото «{$file->getClientOriginalName()}» не удалось сохранить на сервере: нет доступа на запись в папку public/media/{$folder}. "
+                .'Тексты формы сохранены, это фото нет. Сообщите разработчику или администратору сервера.'
+            );
+        }
         $size = @getimagesize(Storage::disk('media')->path($path)) ?: [null, null];
 
         return $owner->photos()->create([

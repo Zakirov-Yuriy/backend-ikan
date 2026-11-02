@@ -51,8 +51,14 @@ class SiteStats
             default => [$today->startOfMonth(), $today->endOfMonth()->startOfDay()],
         };
 
+        /*
+         * Границы по дате, а не whereBetween со строками: в SQLite день хранится
+         * как «2026-11-02 00:00:00», и сравнение с «2026-11-02» выкидывало
+         * сегодняшний день (Саша, 01.11: «статистика отстаёт»).
+         */
         $this->views = PageView::query()
-            ->whereBetween('day', [$this->from->toDateString(), $this->to->toDateString()])
+            ->where('day', '>=', $this->from->toDateString())
+            ->where('day', '<', $this->to->addDay()->toDateString())
             ->get(['day', 'visitor', 'screen', 'apartment_id', 'from_screen', 'referrer_host', 'device']);
 
         $this->leads = Lead::query()

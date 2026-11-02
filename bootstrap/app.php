@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\PhotoStoreException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -35,6 +36,14 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return back()->withErrors('Файлы слишком большие для одной отправки (сервер принимает до 8 МБ за раз). Выберите меньше файлов и повторите.');
+        });
+        /* Файл фото не записался (нет прав на папку): назад к форме с текстом, без записи в базе */
+        $exceptions->render(function (PhotoStoreException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return null;
+            }
+
+            return back()->withInput()->withErrors($e->getMessage());
         });
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

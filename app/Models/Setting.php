@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 /* Настройки админки, ключ и значение */
 class Setting extends Model
 {
+    /* Яндекс Метрика (02.11): номер счётчика и вебвизор. Пусто: счётчика на сайте нет */
+    public const METRIKA_ID = 'metrika_id';
+
+    public const METRIKA_WEBVISOR = 'metrika_webvisor';
+
     public const NOTIFY_EMAILS = 'notify_emails';
 
     public const TELEGRAM_CHAT_ID = 'telegram_chat_id';
