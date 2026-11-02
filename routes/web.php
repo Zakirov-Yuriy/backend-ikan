@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ApartmentController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ComplexController;
+use App\Http\Controllers\Admin\HelpController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\HomePageController;
 use App\Http\Controllers\Admin\HomeRowController;
@@ -53,6 +54,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('settings/test', [SettingsController::class, 'test'])->name('settings.test');
         Route::post('settings/telegram-chats', [SettingsController::class, 'chats'])->name('settings.chats');
         Route::post('settings/bitrix-check', [SettingsController::class, 'bitrixCheck'])->name('settings.bitrix');
+
+        /* Инструкция по админке из docs/ADMIN.md, по разделам (02.11) */
+        Route::get('help/{section?}', [HelpController::class, 'show'])->name('help');
 
         Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
         Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

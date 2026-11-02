@@ -81,5 +81,11 @@
                 <div>Настройки</div>
             </a>
         </li>
+        <li class="menu-item{{ Menu::active('admin.help') ? ' active' : '' }}">
+            <a href="{{ route('admin.help') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-book-open"></i>
+                <div>Инструкция</div>
+            </a>
+        </li>
     </ul>
 </aside>

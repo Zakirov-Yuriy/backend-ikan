@@ -10,3 +10,12 @@
 .js-preview-list img { width: 100%; height: 90px; object-fit: cover; }
 /* Черта слева от заголовков разделов меню («Объекты», «Страницы сайта», «Клиенты») убрана по просьбе Анны 16.10 */
 .menu-header::before, .menu-header:before { display: none !important; }
+/* Инструкция в админке (02.11): текст из docs/ADMIN.md */
+.ikan-help { font-size: 0.9375rem; line-height: 1.6; }
+.ikan-help p, .ikan-help ul, .ikan-help ol, .ikan-help .table-responsive { margin-bottom: 0.9rem; }
+.ikan-help li { margin-bottom: 0.25rem; }
+.ikan-help h3 { margin-top: 1.5rem; }
+.ikan-help code { font-size: 0.875em; padding: 0.1em 0.35em; border-radius: 0.25rem; background: rgba(105, 108, 255, 0.08); color: inherit; }
+.ikan-help table { font-size: 0.875rem; }
+.ikan-help table td, .ikan-help table th { vertical-align: top; }
+.ikan-help-nav .list-group-item { padding: 0.55rem 1.25rem; }
