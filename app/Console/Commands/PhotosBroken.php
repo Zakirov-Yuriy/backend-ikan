@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
  * нет. Такие появлялись, когда PHP не мог писать в public/media: в админке
  * фото «есть», на сайте нет. Показать: php artisan photos:broken.
  * Удалить записи (файлов и так нет): php artisan photos:broken --delete.
+ * Если на диске нет вообще ничего, удаление не выполняется: это пропавшая
+ * папка, а не битые записи (02.11, прод).
  */
 class PhotosBroken extends Command
 {
@@ -44,6 +46,14 @@ class PhotosBroken extends Command
             $this->line('Удалить записи: php artisan photos:broken --delete');
 
             return self::SUCCESS;
+        }
+
+        /* Ни одного файла на диске: пропала вся папка, а не отдельные фото. Удалять записи нельзя, их можно вернуть вместе с файлами */
+        if ($disk->allFiles() === []) {
+            $this->error('Папка public/media пуста или отсутствует: пропали файлы, а не записи. Ничего не удалено.');
+            $this->line('Верните папку (фото из сида: php artisan db:seed --force) и запустите команду снова.');
+
+            return self::FAILURE;
         }
 
         foreach ($broken as $photo) {

@@ -32,6 +32,8 @@ class HomeSeeder extends Seeder
             HomePage::query()->where('objects_all_href', '#')->update(['objects_all_href' => '/dlya-sebya']);
             /* Правка Саши 16.10: заголовок, если его ещё не меняли в админке */
             HomePage::query()->where('hero_title', 'Пространство для жизни.')->update(['hero_title' => 'Пространство для жизни и инвестиций.']);
+            /* Пропавшие фото главной (02.11: на проде удалили папку public/media) возвращаются из сида */
+            $this->restorePhotos();
             $this->command?->info('Главная уже заполнена, тексты не тронуты.');
 
             return;
@@ -102,7 +104,13 @@ class HomeSeeder extends Seeder
 
     private function scenarios(): void
     {
-        $rows = [
+        $this->rows(HomeRow::KIND_SCENARIO, $this->scenarioRows());
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function scenarioRows(): array
+    {
+        return [
             [
                 'title' => 'Покупка жилья для себя',
                 'text' => 'Подберём готовую квартиру для собственного проживания в подходящем районе Сербии.',
@@ -140,12 +148,17 @@ class HomeSeeder extends Seeder
                 'photo' => ['home/scenario-05.jpg', 'Обеденный стол со стульями'],
             ],
         ];
-        $this->rows(HomeRow::KIND_SCENARIO, $rows);
     }
 
     private function directions(): void
     {
-        $rows = [
+        $this->rows(HomeRow::KIND_DIRECTION, $this->directionRows());
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function directionRows(): array
+    {
+        return [
             [
                 'title' => 'Жильё для себя',
                 'text' => 'Покупка квартиры для собственного проживания',
@@ -171,7 +184,45 @@ class HomeSeeder extends Seeder
                 'photo' => ['home/direction-04.jpg', ''],
             ],
         ];
-        $this->rows(HomeRow::KIND_DIRECTION, $rows);
+    }
+
+    /*
+     * Главная уже есть, а фото из сида у неё пропали (удалили папку или
+     * записи): вернуть их. Строки сопоставляются по виду и месту, и только
+     * если ссылка или заголовок совпадают с сидом; фото, которые есть,
+     * не трогаются, тексты тоже.
+     */
+    private function restorePhotos(): void
+    {
+        $home = HomePage::query()->first();
+        if ($home && ! $home->photos()->where('role', Photo::ROLE_CONSULTATION)->exists()) {
+            $home->photos()->create([
+                'role' => Photo::ROLE_CONSULTATION,
+                'path' => 'home/consultation.jpg',
+                'alt' => '',
+                'sort_order' => 1,
+            ]);
+        }
+
+        foreach ([HomeRow::KIND_SCENARIO => $this->scenarioRows(), HomeRow::KIND_DIRECTION => $this->directionRows()] as $kind => $rows) {
+            $existing = HomeRow::query()->ofKind($kind)->orderBy('sort_order')->orderBy('id')->get()->values();
+            foreach ($rows as $i => $row) {
+                $item = $existing->get($i);
+                if (! $item || ($item->link_href !== $row['link_href'] && $item->title !== $row['title'])) {
+                    continue;
+                }
+                foreach ([Photo::ROLE_PHOTO, Photo::ROLE_PHOTO_WIDE] as $role) {
+                    if (isset($row[$role]) && ! $item->photos()->where('role', $role)->exists()) {
+                        $item->photos()->create([
+                            'role' => $role,
+                            'path' => $row[$role][0],
+                            'alt' => $row[$role][1],
+                            'sort_order' => 1,
+                        ]);
+                    }
+                }
+            }
+        }
     }
 
     /** @param  array<int, array<string, mixed>>  $rows */
