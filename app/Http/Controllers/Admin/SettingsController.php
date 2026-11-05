@@ -24,6 +24,8 @@ class SettingsController extends Controller
             'socials' => collect(Setting::SOCIALS)->map(fn ($item, $name) => $item + ['value' => Setting::socials()[$name]]),
             'metrikaId' => Setting::get(Setting::METRIKA_ID, ''),
             'metrikaWebvisor' => Setting::get(Setting::METRIKA_WEBVISOR, '') === '1',
+            'yandexVerification' => Setting::get(Setting::YANDEX_VERIFICATION, ''),
+            'googleVerification' => Setting::get(Setting::GOOGLE_VERIFICATION, ''),
             'notifyEmails' => Setting::get(Setting::NOTIFY_EMAILS, ''),
             'telegramChatId' => Setting::get(Setting::TELEGRAM_CHAT_ID, ''),
             'telegramToken' => (string) config('services.telegram.token') !== '',
@@ -48,6 +50,8 @@ class SettingsController extends Controller
             'social_vk' => ['nullable', 'string', 'max:300', 'url:http,https'],
             'metrika_id' => ['nullable', 'string', 'max:20', 'regex:/^\d+$/'],
             'metrika_webvisor' => ['nullable', 'boolean'],
+            'yandex_verification' => ['nullable', 'string', 'max:500'],
+            'google_verification' => ['nullable', 'string', 'max:500'],
             'notify_emails' => ['nullable', 'string', 'max:500'],
             'telegram_chat_id' => ['nullable', 'string', 'max:50', 'regex:/^-?\d+$/'],
             'bitrix_webhook' => ['nullable', 'string', 'max:500', 'url:https', 'regex:#/rest/\d+/[^/]+/?$#'],
@@ -71,6 +75,8 @@ class SettingsController extends Controller
             'social_telegram' => '«Telegram»',
             'social_vk' => '«ВКонтакте»',
             'metrika_id' => '«номер счётчика Метрики»',
+            'yandex_verification' => '«код Яндекс Вебмастера»',
+            'google_verification' => '«код Google Search Console»',
             'notify_emails' => '«почта для уведомлений»',
             'telegram_chat_id' => '«chat id в Telegram»',
             'bitrix_webhook' => '«ссылка вебхука Битрикс24»',
@@ -97,6 +103,15 @@ class SettingsController extends Controller
         foreach (Setting::SOCIALS as $item) {
             Setting::set($item['key'], trim((string) ($data[$item['key']] ?? '')));
         }
+        foreach ([Setting::YANDEX_VERIFICATION => 'yandex_verification', Setting::GOOGLE_VERIFICATION => 'google_verification'] as $key => $field) {
+            $code = self::verificationCode((string) ($data[$field] ?? ''));
+            if ($code === null) {
+                $label = $field === 'yandex_verification' ? 'Яндекс Вебмастер' : 'Google Search Console';
+
+                return back()->withInput()->withErrors("{$label}: вставьте строку <meta ... content=\"...\"> целиком, как её даёт кабинет, или только код из content (латинские буквы, цифры, дефис).");
+            }
+            Setting::set($key, $code);
+        }
         Setting::set(Setting::METRIKA_ID, trim((string) ($data['metrika_id'] ?? '')));
         Setting::set(Setting::METRIKA_WEBVISOR, $request->boolean('metrika_webvisor') ? '1' : '');
         Setting::set(Setting::NOTIFY_EMAILS, trim($raw));
@@ -108,6 +123,24 @@ class SettingsController extends Controller
         Setting::set(Setting::BITRIX_STAGE, trim((string) ($data['bitrix_stage'] ?? '')));
 
         return redirect()->route('admin.settings.edit')->with('success', 'Настройки сохранены.');
+    }
+
+    /*
+     * Код подтверждения из вставленного текста: принимается строка целиком,
+     * как её выдаёт Вебмастер или Search Console (<meta name="..." content="КОД">),
+     * или только код. null, если это не похоже ни на то, ни на другое.
+     */
+    public static function verificationCode(string $raw): ?string
+    {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return '';
+        }
+        if (preg_match('/content\s*=\s*["\']([^"\']+)["\']/iu', $raw, $m)) {
+            $raw = trim($m[1]);
+        }
+
+        return preg_match('/^[A-Za-z0-9_.\-]{4,200}$/', $raw) ? $raw : null;
     }
 
     /* Проверочное уведомление на текущие настройки */

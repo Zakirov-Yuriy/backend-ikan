@@ -42,6 +42,18 @@
                             </div>
                             <div class="form-text mb-4">Цели для рекламы сайт отправляет сам, их нужно только создать в Метрике как «JavaScript-событие» с такими идентификаторами: <code>call</code> (нажали «Позвонить» или на телефон), <code>request_open</code> (открыли окно «Оставить заявку»), <code>request</code> (отправили заявку, любая из двух форм), <code>social</code> (нажали иконку MAX, Telegram или ВКонтакте).</div>
 
+                            <div class="divider text-start"><div class="divider-text">Подтверждение сайта в Яндекс Вебмастере и Google</div></div>
+                            <div class="mb-3">
+                                <label for="yandex_verification" class="form-label">Яндекс Вебмастер</label>
+                                <input type="text" class="form-control" name="yandex_verification" id="yandex_verification" maxlength="500" placeholder='<meta name="yandex-verification" content="1234567890abcdef" />' value="{{ old('yandex_verification', $yandexVerification) }}"/>
+                                <div class="form-text">В Вебмастере при добавлении сайта выберите способ «Мета-тег» и вставьте сюда строку целиком, как она там показана (или только код из content). Сайт сам поставит этот тег на все страницы, после сохранения нажмите в Вебмастере «Проверить». После смены домена вставьте сюда новый код.</div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="google_verification" class="form-label">Google Search Console</label>
+                                <input type="text" class="form-control" name="google_verification" id="google_verification" maxlength="500" placeholder='<meta name="google-site-verification" content="..." />' value="{{ old('google_verification', $googleVerification) }}"/>
+                                <div class="form-text">То же самое для Google: способ подтверждения «HTML-тег», строку целиком или только код.</div>
+                            </div>
+
                             <div class="divider text-start"><div class="divider-text">Уведомления о заявках</div></div>
                             <div class="mb-4">
                                 <label for="notify_emails" class="form-label">Почта для уведомлений</label>

@@ -75,7 +75,7 @@ php artisan serve
 
 | Запрос | Что отдаёт |
 |---|---|
-| `GET /api/site` | `phone` (главный, `{label, href}`), `phones` (все телефоны), `socials` (`{max, telegram, vk}`, `null` если иконку не показывать), `metrika` (`{id, webvisor}`, `id` `null` без счётчика) |
+| `GET /api/site` | `phone` (главный, `{label, href}`), `phones` (все телефоны), `socials` (`{max, telegram, vk}`, `null` если иконку не показывать), `metrika` (`{id, webvisor}`, `id` `null` без счётчика), `verification` (`{yandex, google}`, коды подтверждения для мета-тегов в head сайта, `null` если не заданы) |
 | `GET /api/home` | главная целиком: первый экран, строки, «О компании», направления, «Актуальные объекты» (до трёх), блок подбора, SEO |
 | `GET /api/pages/{key}` | вступление списка: `living`, `renting`, `newbuilds` |
 | `GET /api/complexes` | список ЖК по порядку |

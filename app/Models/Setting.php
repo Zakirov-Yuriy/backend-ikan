@@ -12,6 +12,11 @@ class Setting extends Model
 
     public const METRIKA_WEBVISOR = 'metrika_webvisor';
 
+    /* Коды подтверждения сайта (05.11): Яндекс Вебмастер и Google Search Console, мета-теги в head сайта */
+    public const YANDEX_VERIFICATION = 'yandex_verification';
+
+    public const GOOGLE_VERIFICATION = 'google_verification';
+
     public const NOTIFY_EMAILS = 'notify_emails';
 
     public const TELEGRAM_CHAT_ID = 'telegram_chat_id';
