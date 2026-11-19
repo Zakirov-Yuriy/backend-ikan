@@ -21,26 +21,30 @@
                                 <div class="form-text">Показывается рядом с главным везде, где телефон написан текстом. Если оставить пустым, на сайте будет один телефон.</div>
                             </div>
 
-                            <div class="divider text-start"><div class="divider-text">Иконки в подвале сайта</div></div>
+                            <div class="divider text-start"><div class="divider-text">Иконки в шапке и подвале сайта</div></div>
                             @foreach($socials as $item)
                                 <div class="mb-3">
                                     <label for="{{ $item['key'] }}" class="form-label">{{ $item['label'] }}</label>
                                     <input type="url" class="form-control" name="{{ $item['key'] }}" id="{{ $item['key'] }}" maxlength="300" placeholder="{{ $item['default'] }}" value="{{ old($item['key'], $item['value']) }}"/>
                                 </div>
                             @endforeach
-                            <div class="form-text mb-4">Ссылка открывается в новой вкладке по нажатию на иконку. Если поле пустое, иконка на сайте не показывается.</div>
+                            <div class="mb-3">
+                                <label for="contact_email" class="form-label">Почта</label>
+                                <input type="email" class="form-control" name="contact_email" id="contact_email" maxlength="190" placeholder="info@ik-ikan.ru" value="{{ old('contact_email', $contactEmail) }}"/>
+                            </div>
+                            <div class="form-text mb-4">Иконки стоят в шапке сайта слева от телефонов и в подвале. Ссылка открывается в новой вкладке по нажатию на иконку, почта открывает почтовую программу с этим адресом; адрес также показывается в нижней строке подвала. Если поле пустое, иконка на сайте не показывается.</div>
 
                             <div class="divider text-start"><div class="divider-text">Яндекс Метрика</div></div>
                             <div class="mb-3">
                                 <label for="metrika_id" class="form-label">Номер счётчика</label>
                                 <input type="text" class="form-control" name="metrika_id" id="metrika_id" inputmode="numeric" maxlength="20" placeholder="12345678" value="{{ old('metrika_id', $metrikaId) }}"/>
-                                <div class="form-text">Только число, оно видно в кабинете Метрики рядом с названием счётчика. Код счётчика на сайт вставлять не нужно, сайт подключит его сам. Пусто: счётчика на сайте нет. Счётчик работает только у посетителей, которые разрешили аналитические cookie («Принять все» или «Аналитические» в настройках cookie).</div>
+                                <div class="form-text">Только число, оно видно в кабинете Метрики рядом с названием счётчика. Код счётчика на сайт вставлять не нужно, сайт подключит его сам. Пусто: счётчика на сайте нет. Код счётчика стоит на каждой странице и работает сразу; посетитель может выключить его в настройках плашки cookie («Аналитические»).</div>
                             </div>
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="checkbox" name="metrika_webvisor" id="metrika_webvisor" value="1" @checked(old('metrika_webvisor', $metrikaWebvisor))>
                                 <label class="form-check-label" for="metrika_webvisor">Вебвизор, карта кликов</label>
                             </div>
-                            <div class="form-text mb-4">Цели для рекламы сайт отправляет сам, их нужно только создать в Метрике как «JavaScript-событие» с такими идентификаторами: <code>call</code> (нажали «Позвонить» или на телефон), <code>request_open</code> (открыли окно «Оставить заявку»), <code>request</code> (отправили заявку, любая из двух форм), <code>social</code> (нажали иконку MAX, Telegram или ВКонтакте).</div>
+                            <div class="form-text mb-4">Цели для рекламы сайт отправляет сам, их нужно только создать в Метрике как «JavaScript-событие» с такими идентификаторами: <code>call</code> (нажали «Позвонить» или на телефон), <code>request_open</code> (открыли окно «Оставить заявку»), <code>request</code> (отправили заявку, любая из двух форм), <code>social</code> (нажали иконку MAX, Telegram, ВКонтакте или почты).</div>
 
                             <div class="divider text-start"><div class="divider-text">Подтверждение сайта в Яндекс Вебмастере и Google</div></div>
                             <div class="mb-3">

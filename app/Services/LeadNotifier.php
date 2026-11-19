@@ -63,6 +63,9 @@ class LeadNotifier
             'Имя: '.e($lead->name),
             'Телефон: '.e($lead->phone),
         ];
+        if ($lead->email) {
+            $lines[] = 'Почта: '.e($lead->email);
+        }
         if ($lead->interest) {
             $lines[] = 'Что интересует: '.e($lead->interest);
         }

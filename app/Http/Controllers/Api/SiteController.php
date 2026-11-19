@@ -11,8 +11,9 @@ class SiteController extends Controller
     /*
      * Общие данные сайта из настроек. phone: главный телефон (кнопки
      * «Позвонить»), phones: все телефоны для текста, socials: ссылки иконок
-     * подвала, null если иконку не показывать. metrika: счётчик Яндекс
-     * Метрики (02.11), id null, если счётчик не задан в «Настройках».
+     * шапки и подвала, null если иконку не показывать. email: почта для связи
+     * (19.11), иконка письма и адрес в подвале, null если не задана. metrika:
+     * счётчик Яндекс Метрики (02.11), id null, если счётчик не задан.
      */
     public function show(): JsonResponse
     {
@@ -23,6 +24,7 @@ class SiteController extends Controller
             'phone' => ['label' => $phone, 'href' => Setting::phoneHref($phone)],
             'phones' => array_map(fn ($item) => ['label' => $item, 'href' => Setting::phoneHref($item)], Setting::phones()),
             'socials' => $socials,
+            'email' => ($email = Setting::contactEmail()) !== '' ? $email : null,
             /* Коды подтверждения для мета-тегов в head сайта (05.11), null если не заданы */
             'verification' => [
                 'yandex' => ($y = trim((string) Setting::get(Setting::YANDEX_VERIFICATION, ''))) !== '' ? $y : null,

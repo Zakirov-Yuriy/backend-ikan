@@ -27,6 +27,8 @@ class LeadController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
             'phone' => ['bail', 'required', 'string', 'min:5', 'max:50', 'regex:/^[\d\s()+\-]+$/', $this->phoneLength(...)],
+            /* Почта по желанию (19.11): пустое поле принимается, заполненное должно быть адресом */
+            'email' => ['nullable', 'string', 'max:190', 'email'],
             'interest' => ['nullable', 'string', 'max:2000'],
             'source' => ['required', Rule::in([Lead::SOURCE_CALLBACK, Lead::SOURCE_POPUP])],
             'page' => ['nullable', 'string', 'max:255'],
@@ -36,9 +38,11 @@ class LeadController extends Controller
             'consent_ads' => ['sometimes', 'boolean'],
         ], [
             'phone.regex' => 'В телефоне могут быть только цифры, пробелы, скобки, плюс и дефис.',
+            'email.email' => 'Проверьте почту: адрес должен быть вида name@example.com.',
         ], [
             'name' => '«имя»',
             'phone' => '«телефон»',
+            'email' => '«почта»',
             'interest' => '«что вас интересует»',
             'consent_terms' => '«согласие с соглашением и политикой»',
             'consent_privacy' => '«согласие на обработку персональных данных»',
@@ -49,6 +53,7 @@ class LeadController extends Controller
             ...$data,
             'name' => trim($data['name']),
             'phone' => trim($data['phone']),
+            'email' => isset($data['email']) ? mb_strtolower(trim($data['email'])) ?: null : null,
             'interest' => isset($data['interest']) ? trim($data['interest']) ?: null : null,
             'consent_terms' => true,
             'consent_privacy' => true,

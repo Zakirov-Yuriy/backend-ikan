@@ -117,12 +117,19 @@ class Bitrix24
         return [['VALUE' => $lead->phone, 'VALUE_TYPE' => 'WORK']];
     }
 
+    /* Почта заявки, если посетитель её указал (19.11) */
+    private function email(Lead $lead): array
+    {
+        return $lead->email ? ['EMAIL' => [['VALUE' => $lead->email, 'VALUE_TYPE' => 'WORK']]] : [];
+    }
+
     private function leadFields(Lead $lead, bool $test): array
     {
         return [
             'TITLE' => $this->title($lead, $test),
             'NAME' => $lead->name,
             'PHONE' => $this->phone($lead),
+            ...$this->email($lead),
             'COMMENTS' => $this->comments($lead),
             ...$this->common($lead),
         ];
@@ -130,7 +137,7 @@ class Bitrix24
 
     private function contactFields(Lead $lead): array
     {
-        return ['NAME' => $lead->name, 'PHONE' => $this->phone($lead), ...$this->common($lead)];
+        return ['NAME' => $lead->name, 'PHONE' => $this->phone($lead), ...$this->email($lead), ...$this->common($lead)];
     }
 
     private function dealFields(Lead $lead, int $contactId, bool $test): array

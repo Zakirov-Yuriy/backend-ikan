@@ -48,8 +48,15 @@ class Setting extends Model
     public const DEFAULT_PHONE_2 = '+7 (991) 587-24-57';
 
     /*
-     * Ссылки иконок в подвале, порядок как в макете. Пустое поле в админке:
-     * иконка на сайте не показывается.
+     * Почта для связи (19.11): иконка письма рядом с MAX, Telegram и ВКонтакте
+     * в шапке и подвале сайта (открывает почтовую программу) и адрес в нижней
+     * строке подвала. Пусто: иконки и адреса на сайте нет.
+     */
+    public const CONTACT_EMAIL = 'contact_email';
+
+    /*
+     * Ссылки иконок в шапке и подвале, порядок как в макете. Пустое поле в
+     * админке: иконка на сайте не показывается.
      */
     public const SOCIALS = [
         'max' => ['key' => 'social_max', 'label' => 'MAX', 'default' => 'https://max.ru/u/f9LHodD0cOKw4NzKJl7VwikboHE9YRgKRd8GrqCCE2A1VsGgQ56KcSluPHc'],
@@ -95,6 +102,12 @@ class Setting extends Model
     public static function phones(): array
     {
         return array_values(array_filter([static::phone(), static::phone2()], fn ($phone) => $phone !== ''));
+    }
+
+    /* Почта для связи, пустая строка если не задана */
+    public static function contactEmail(): string
+    {
+        return trim((string) static::get(self::CONTACT_EMAIL, ''));
     }
 
     /** @return array<string, string> ссылки иконок по ключу (max, telegram, vk), пустая строка если иконка не нужна */

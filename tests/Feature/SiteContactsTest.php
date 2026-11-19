@@ -59,4 +59,18 @@ class SiteContactsTest extends TestCase
             ->assertJsonPath('data.socials.telegram', 'https://t.me/ikan_serbia');
         $this->get('/admin/settings')->assertOk();
     }
+
+    /* Почта для связи (19.11): иконка письма и адрес в подвале, пусто по умолчанию */
+    public function test_contact_email(): void
+    {
+        $this->getJson('/api/site')->assertOk()->assertJsonPath('data.email', null);
+
+        $this->actingAs(User::factory()->create());
+        $this->get('/admin/settings')->assertOk()->assertSee('name="contact_email"', false);
+        $this->put('/admin/settings', ['contact_email' => 'не почта'] + $this->form)->assertSessionHasErrors('contact_email');
+        $this->put('/admin/settings', ['contact_email' => ' Info@IK-ikan.ru '] + $this->form)->assertSessionHasNoErrors();
+        $this->getJson('/api/site')->assertJsonPath('data.email', 'info@ik-ikan.ru');
+        $this->put('/admin/settings', ['contact_email' => ''] + $this->form)->assertSessionHasNoErrors();
+        $this->getJson('/api/site')->assertJsonPath('data.email', null);
+    }
 }

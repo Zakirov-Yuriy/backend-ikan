@@ -17,7 +17,7 @@ class Lead extends Model
     public const STATUS_DONE = 'done';
 
     protected $fillable = [
-        'name', 'phone', 'interest', 'source', 'page',
+        'name', 'phone', 'email', 'interest', 'source', 'page',
         'consent_terms', 'consent_privacy', 'consent_ads', 'ip', 'user_agent', 'status',
     ];
 

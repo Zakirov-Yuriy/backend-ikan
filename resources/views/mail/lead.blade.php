@@ -9,6 +9,9 @@
 <table cellpadding="4" cellspacing="0" style="border-collapse: collapse;">
     <tr><td style="color: #667781;">Имя</td><td><strong>{{ $lead->name }}</strong></td></tr>
     <tr><td style="color: #667781;">Телефон</td><td><a href="tel:{{ preg_replace('/[^\d+]/', '', $lead->phone) }}">{{ $lead->phone }}</a></td></tr>
+    @if($lead->email)
+        <tr><td style="color: #667781;">Почта</td><td><a href="mailto:{{ $lead->email }}">{{ $lead->email }}</a></td></tr>
+    @endif
     @if($lead->interest)
         <tr><td style="color: #667781; vertical-align: top;">Что интересует</td><td>{{ $lead->interest }}</td></tr>
     @endif

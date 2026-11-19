@@ -25,7 +25,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>Когда</th>
-                            <th>Имя и телефон</th>
+                            <th>Имя, телефон, почта</th>
                             <th>Что интересует</th>
                             <th>Откуда</th>
                             <th>Реклама</th>
@@ -37,7 +37,7 @@
                         @foreach($leads as $lead)
                             <tr class="{{ $lead->isNew() ? 'fw-semibold' : '' }}">
                                 <td class="text-nowrap">{{ $lead->created_at->format('d.m.Y') }}<br><small class="text-muted">{{ $lead->created_at->format('H:i') }}</small></td>
-                                <td class="text-nowrap">{{ $lead->name }}<br><a href="tel:{{ preg_replace('/[^\d+]/', '', $lead->phone) }}">{{ $lead->phone }}</a></td>
+                                <td class="text-nowrap">{{ $lead->name }}<br><a href="tel:{{ preg_replace('/[^\d+]/', '', $lead->phone) }}">{{ $lead->phone }}</a>@if($lead->email)<br><a href="mailto:{{ $lead->email }}">{{ $lead->email }}</a>@endif</td>
                                 <td style="max-width: 320px; white-space: normal">{{ $lead->interest ?: '' }}</td>
                                 <td style="white-space: normal"><small>{{ $lead->sourceLabel() }}@if($lead->page)<br><a href="{{ config('app.site_url') }}{{ $lead->page }}" target="_blank" rel="noopener" class="text-muted">{{ $lead->page }}</a>@endif</small></td>
                                 <td>@if($lead->consent_ads)<span class="badge bg-label-info" title="Согласие на рекламные и информационные сообщения">согласен</span>@else<small class="text-muted">нет</small>@endif</td>

@@ -49,6 +49,31 @@ class LeadsTest extends TestCase
         Http::assertSent(fn ($request) => str_contains($request->url(), 'bottoken/sendMessage') && $request['chat_id'] === '123' && str_contains($request['text'], 'Анна'));
     }
 
+    /* Почта в заявке по желанию (19.11): без неё принимается, с ней уходит в уведомления и админку */
+    public function test_optional_email(): void
+    {
+        Mail::fake();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true])]);
+        Setting::set(Setting::TELEGRAM_CHAT_ID, '123');
+        config(['services.telegram.token' => 'token']);
+
+        $this->postJson('/api/requests', $this->payload)->assertCreated();
+        $this->assertNull(Lead::query()->latest('id')->firstOrFail()->email);
+        $this->postJson('/api/requests', [...$this->payload, 'email' => ''])->assertCreated();
+        $this->assertNull(Lead::query()->latest('id')->firstOrFail()->email);
+        $this->postJson('/api/requests', [...$this->payload, 'email' => 'anna@'])
+            ->assertUnprocessable()->assertJsonValidationErrors(['email']);
+
+        $this->postJson('/api/requests', [...$this->payload, 'email' => ' Anna@Example.com '])->assertCreated();
+        $lead = Lead::query()->latest('id')->firstOrFail();
+        $this->assertSame('anna@example.com', $lead->email);
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'sendMessage') && str_contains($request['text'], 'Почта: anna@example.com'));
+        $this->assertStringContainsString('anna@example.com', (new LeadMail($lead))->render());
+
+        $this->actingAs(User::factory()->create());
+        $this->get('/admin/leads')->assertOk()->assertSee('mailto:anna@example.com', false);
+    }
+
     public function test_api_validation_honeypot_and_throttle(): void
     {
         Mail::fake();
