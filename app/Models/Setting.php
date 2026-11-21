@@ -12,6 +12,17 @@ class Setting extends Model
 
     public const METRIKA_WEBVISOR = 'metrika_webvisor';
 
+    /*
+     * Автоматическое окно заявки (Саша, 21.11): через popup_delay секунд после
+     * захода на сайт открывается окно «Оставить заявку», один раз за визит.
+     * popup_enabled '1' или '' (выключено). По умолчанию включено, 10 секунд.
+     */
+    public const POPUP_ENABLED = 'popup_enabled';
+
+    public const POPUP_DELAY = 'popup_delay';
+
+    public const DEFAULT_POPUP_DELAY = 10;
+
     /* Коды подтверждения сайта (05.11): Яндекс Вебмастер и Google Search Console, мета-теги в head сайта */
     public const YANDEX_VERIFICATION = 'yandex_verification';
 
@@ -102,6 +113,17 @@ class Setting extends Model
     public static function phones(): array
     {
         return array_values(array_filter([static::phone(), static::phone2()], fn ($phone) => $phone !== ''));
+    }
+
+    /** @return array{enabled: bool, delay: int} настройки автоматического окна заявки */
+    public static function popup(): array
+    {
+        $delay = (int) static::get(self::POPUP_DELAY, (string) self::DEFAULT_POPUP_DELAY);
+
+        return [
+            'enabled' => static::get(self::POPUP_ENABLED, '1') === '1',
+            'delay' => $delay >= 1 && $delay <= 600 ? $delay : self::DEFAULT_POPUP_DELAY,
+        ];
     }
 
     /* Почта для связи, пустая строка если не задана */

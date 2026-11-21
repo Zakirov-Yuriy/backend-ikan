@@ -30,7 +30,7 @@ class LeadController extends Controller
             /* Почта по желанию (19.11): пустое поле принимается, заполненное должно быть адресом */
             'email' => ['nullable', 'string', 'max:190', 'email'],
             'interest' => ['nullable', 'string', 'max:2000'],
-            'source' => ['required', Rule::in([Lead::SOURCE_CALLBACK, Lead::SOURCE_POPUP])],
+            'source' => ['required', Rule::in([Lead::SOURCE_CALLBACK, Lead::SOURCE_POPUP, Lead::SOURCE_AUTO])],
             'page' => ['nullable', 'string', 'max:255'],
             'consent_terms' => ['accepted'],
             'consent_privacy' => ['accepted'],

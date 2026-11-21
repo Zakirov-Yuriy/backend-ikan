@@ -25,6 +25,8 @@ class SiteController extends Controller
             'phones' => array_map(fn ($item) => ['label' => $item, 'href' => Setting::phoneHref($item)], Setting::phones()),
             'socials' => $socials,
             'email' => ($email = Setting::contactEmail()) !== '' ? $email : null,
+            /* Автоматическое окно заявки (21.11): включено ли и через сколько секунд */
+            'popup' => Setting::popup(),
             /* Коды подтверждения для мета-тегов в head сайта (05.11), null если не заданы */
             'verification' => [
                 'yandex' => ($y = trim((string) Setting::get(Setting::YANDEX_VERIFICATION, ''))) !== '' ? $y : null,

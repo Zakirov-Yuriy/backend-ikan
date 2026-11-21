@@ -23,6 +23,7 @@ class SettingsController extends Controller
             'phone2' => Setting::phone2(),
             'socials' => collect(Setting::SOCIALS)->map(fn ($item, $name) => $item + ['value' => Setting::socials()[$name]]),
             'contactEmail' => Setting::contactEmail(),
+            'popup' => Setting::popup(),
             'metrikaId' => Setting::get(Setting::METRIKA_ID, ''),
             'metrikaWebvisor' => Setting::get(Setting::METRIKA_WEBVISOR, '') === '1',
             'yandexVerification' => Setting::get(Setting::YANDEX_VERIFICATION, ''),
@@ -50,6 +51,8 @@ class SettingsController extends Controller
             'social_telegram' => ['nullable', 'string', 'max:300', 'url:http,https'],
             'social_vk' => ['nullable', 'string', 'max:300', 'url:http,https'],
             'contact_email' => ['nullable', 'string', 'max:190', 'email'],
+            'popup_enabled' => ['nullable', 'boolean'],
+            'popup_delay' => ['nullable', 'integer', 'min:1', 'max:600'],
             'metrika_id' => ['nullable', 'string', 'max:20', 'regex:/^\d+$/'],
             'metrika_webvisor' => ['nullable', 'boolean'],
             'yandex_verification' => ['nullable', 'string', 'max:500'],
@@ -77,6 +80,7 @@ class SettingsController extends Controller
             'social_telegram' => '«Telegram»',
             'social_vk' => '«ВКонтакте»',
             'contact_email' => '«почта для связи»',
+            'popup_delay' => '«через сколько секунд показывать окно»',
             'metrika_id' => '«номер счётчика Метрики»',
             'yandex_verification' => '«код Яндекс Вебмастера»',
             'google_verification' => '«код Google Search Console»',
@@ -107,6 +111,8 @@ class SettingsController extends Controller
             Setting::set($item['key'], trim((string) ($data[$item['key']] ?? '')));
         }
         Setting::set(Setting::CONTACT_EMAIL, mb_strtolower(trim((string) ($data['contact_email'] ?? ''))));
+        Setting::set(Setting::POPUP_ENABLED, $request->boolean('popup_enabled') ? '1' : '');
+        Setting::set(Setting::POPUP_DELAY, (string) (int) ($data['popup_delay'] ?? Setting::DEFAULT_POPUP_DELAY));
         foreach ([Setting::YANDEX_VERIFICATION => 'yandex_verification', Setting::GOOGLE_VERIFICATION => 'google_verification'] as $key => $field) {
             $code = self::verificationCode((string) ($data[$field] ?? ''));
             if ($code === null) {

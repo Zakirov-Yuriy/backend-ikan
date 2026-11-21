@@ -32,7 +32,18 @@
                                 <label for="contact_email" class="form-label">Почта</label>
                                 <input type="email" class="form-control" name="contact_email" id="contact_email" maxlength="190" placeholder="info@ik-ikan.ru" value="{{ old('contact_email', $contactEmail) }}"/>
                             </div>
-                            <div class="form-text mb-4">Иконки стоят в шапке сайта слева от телефонов и в подвале. Ссылка открывается в новой вкладке по нажатию на иконку, почта открывает почтовую программу с этим адресом; адрес также показывается в нижней строке подвала. Если поле пустое, иконка на сайте не показывается.</div>
+                            <div class="form-text mb-4">Иконки стоят в шапке сайта (слева от телефонов, на телефоне слева от кнопки меню) и в подвале. Ссылка открывается в новой вкладке по нажатию на иконку, почта открывает почтовую программу с этим адресом; адрес также показывается в нижней строке подвала. Если поле пустое, иконка на сайте не показывается.</div>
+
+                            <div class="divider text-start"><div class="divider-text">Автоматическое окно заявки</div></div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="popup_enabled" id="popup_enabled" value="1" @checked(old('popup_enabled', $popup['enabled']))>
+                                <label class="form-check-label" for="popup_enabled">Показывать окно «Оставить заявку» автоматически</label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="popup_delay" class="form-label">Через сколько секунд после захода на сайт</label>
+                                <input type="number" class="form-control" name="popup_delay" id="popup_delay" min="1" max="600" step="1" inputmode="numeric" style="max-width: 160px" value="{{ old('popup_delay', $popup['delay']) }}"/>
+                                <div class="form-text mb-4">Окно открывается один раз за визит, на любой странице, с которой посетитель зашёл; его можно закрыть крестиком. Не показывается тем, кто уже сам открыл окно заявки или уже отправлял заявку с этого браузера. Снимите галочку, чтобы окно само не открывалось.</div>
+                            </div>
 
                             <div class="divider text-start"><div class="divider-text">Яндекс Метрика</div></div>
                             <div class="mb-3">

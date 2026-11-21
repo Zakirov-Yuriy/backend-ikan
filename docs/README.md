@@ -75,7 +75,7 @@ php artisan serve
 
 | Запрос | Что отдаёт |
 |---|---|
-| `GET /api/site` | `phone` (главный, `{label, href}`), `phones` (все телефоны), `socials` (`{max, telegram, vk}`, `null` если иконку не показывать), `email` (почта для связи, `null` если не задана), `metrika` (`{id, webvisor}`, `id` `null` без счётчика), `verification` (`{yandex, google}`, коды подтверждения для мета-тегов в head сайта, `null` если не заданы) |
+| `GET /api/site` | `phone` (главный, `{label, href}`), `phones` (все телефоны), `socials` (`{max, telegram, vk}`, `null` если иконку не показывать), `email` (почта для связи, `null` если не задана), `popup` (`{enabled, delay}`, автоматическое окно заявки и задержка в секундах), `metrika` (`{id, webvisor}`, `id` `null` без счётчика), `verification` (`{yandex, google}`, коды подтверждения для мета-тегов в head сайта, `null` если не заданы) |
 | `GET /api/home` | главная целиком: первый экран, строки, «О компании», направления, «Актуальные объекты» (до трёх), блок подбора, SEO |
 | `GET /api/pages/{key}` | вступление списка: `living`, `renting`, `newbuilds` |
 | `GET /api/complexes` | список ЖК по порядку |
@@ -83,7 +83,7 @@ php artisan serve
 | `GET /api/apartments/{slug}` | страница апартамента |
 | `GET /api/restaurant` | страница ресторана |
 | `POST /api/views` | просмотр страницы: `path`, `from` (предыдущая страница сайта), `referrer` (откуда пришли со стороны); роботы, неизвестные адреса и несуществующие апартаменты не считаются; ответ 204; не больше 120 в минуту с одного адреса |
-| `POST /api/requests` | приём заявки (`name`, `phone`, `email` необязательная, `interest`, `source`, `page`, согласия); телефон: число цифр как в номерах страны (`giggsey/libphonenumber-for-php-lite`, `isPossibleNumber`, без кода страны номер российский); `consent_terms` и `consent_privacy` должны быть `true`, `consent_ads` необязательное; не больше 20 в минуту с одного адреса |
+| `POST /api/requests` | приём заявки (`name`, `phone`, `email` необязательная, `interest`, `source` из `callback`, `popup`, `popup_auto`, `page`, согласия); телефон: число цифр как в номерах страны (`giggsey/libphonenumber-for-php-lite`, `isPossibleNumber`, без кода страны номер российский); `consent_terms` и `consent_privacy` должны быть `true`, `consent_ads` необязательное; не больше 20 в минуту с одного адреса |
 
 «Актуальные объекты» (`Apartment::homeObjects()`): первые три апартамента с галочкой «На главной» в порядке списка; если галочки нет ни у одного, первые три из списка.
 

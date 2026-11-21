@@ -12,6 +12,9 @@ class Lead extends Model
 
     public const SOURCE_POPUP = 'popup';
 
+    /* Окно заявки открылось само через заданное в настройках время (21.11) */
+    public const SOURCE_AUTO = 'popup_auto';
+
     public const STATUS_NEW = 'new';
 
     public const STATUS_DONE = 'done';
@@ -38,7 +41,11 @@ class Lead extends Model
     /* Подпись источника для админки и уведомлений */
     public function sourceLabel(): string
     {
-        return $this->source === self::SOURCE_POPUP ? 'Окно «Оставить заявку»' : 'Форма «Заказать обратный звонок»';
+        return match ($this->source) {
+            self::SOURCE_POPUP => 'Окно «Оставить заявку»',
+            self::SOURCE_AUTO => 'Окно «Оставить заявку», открылось само',
+            default => 'Форма «Заказать обратный звонок»',
+        };
     }
 
     public function isNew(): bool
